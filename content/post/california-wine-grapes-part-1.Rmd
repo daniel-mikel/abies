@@ -1,0 +1,74 @@
+---
+title: "California Wine  - Part 1"
+author: "Daniel Mikel"
+date: "November 22, 2017"
+output: html_document
+runtime: shiny
+---
+
+This is a draft
+
+The [United States Department of Agriculture](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it's price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.
+
+```{r, message = FALSE, echo = FALSE}
+library(ggridges)
+library(ggjoy)
+library(tidyverse)
+library(knitr)
+
+gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
+district_key <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/district_key.csv")
+gc$District_Number <- as.factor(gc$District_Number)
+district_key$District_Number <- as.factor(district_key$District_Number)
+
+gc <- gc %>%
+  left_join(district_key)
+
+```
+
+```{r}
+head(gc[1:6], n = 10)
+```
+
+insert bar graph of district tonnage here
+
+```{r}
+# bar chart of district tonnages goes here
+```
+
+We can also see a distribution of prices by district. We can see that districts with lower prices have much less varience in the price than more expensive districts. (This might be better with just using a violen plot)
+
+```{r, echo = FALSE, message = FALSE, fig.height = 8, fig.width = 10}
+gc %>%
+  filter(Base.Price.Per.Ton <= 10000) %>%
+  group_by(District_Number) %>%
+  mutate(m = mean(Base.Price.Per.Ton)) %>%
+  arrange(m) %>%
+  ungroup() %>%
+  mutate(label = factor(District_Disc, unique(District_Disc))) %>%
+  ggplot(aes(x = Base.Price.Per.Ton, y = label, fill = label)) + 
+  geom_joy(rel_min_height = 0.005, scale = 2,alpha = 0.5) +
+  # scale_x_continuous(breaks = c(0,5000, 10000, 15000)) +
+  scale_y_discrete(expand = c(0.01, 0)) +
+  scale_fill_cyclical(values = c("#66c2a5",
+                                 "#fc8d62",
+                                 "#8da0cb",
+                                 "#e78ac3",
+                                 "#a6d854",
+                                 "#ffd92f",
+                                 "#e5c494")) +
+  theme_joy() +
+  xlab("Price, Dollars per Ton") +
+  ylab("Grape Pricing District")  
+```
+
+We can even conduct exploritory analysis on 
+
+
+
+```{r, echo = FALSE}
+
+knitr::include_app("https://daniel-mikel.shinyapps.io/historic_california_grape_crush/", 
+                   height = "600px")
+
+```
