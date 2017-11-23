@@ -86,7 +86,8 @@ gc %>%
                                  "#e5c494")) +
   theme_joy() +
   theme(axis.text=element_text(size=10)) +
-  xlab("Price, Dollars per Ton") 
+  xlab("Price, Dollars per Ton") +
+  ylab(NULL) 
 
 ```
 
