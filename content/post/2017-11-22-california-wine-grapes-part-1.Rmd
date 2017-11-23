@@ -38,7 +38,7 @@ insert bar graph of district tonnage here
 
 We can also see a distribution of prices by district. We can see that districts with lower prices have much less varience in the price than more expensive districts. (This might be better with just using a violen plot)
 
-```{r, echo = FALSE, message = FALSE, fig.height = 9, fig.width = 12}
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 10}
 gc %>%
   filter(Base.Price.Per.Ton <= 10000) %>%
   group_by(District_Number) %>%
@@ -61,13 +61,13 @@ gc %>%
   xlab("Price, Dollars per Ton")
 ```
 
-We can even conduct exploritory analysis on 
 
 
+We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties 
 
 ```{r, echo = FALSE, fig.width = 10}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
-                   height = "700px")
+                   height = "675px")
 
 ```
