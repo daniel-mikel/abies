@@ -26,13 +26,13 @@ gc <- gc %>%
 
 ```
 
-```{r, fig.width = 8}
+```{r, fig.width = 9}
 head(gc[1:6], n = 10)
 ```
 
 We can see the distribution of tonnage within California's wine regions.
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 8}
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
 cols <- c("red" = "#F8766D", "white" = "#00BFC4", "raisin" = "#C77CFF", "table" = "#7CAE00", "all wine" = "#190B28")
 
 gc %>%
