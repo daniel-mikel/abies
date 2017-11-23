@@ -68,7 +68,7 @@ gc %>%
 
 We can also see a distribution of prices by district. We can see a sharp 
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 8}
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
 gc %>%
   filter(Base.Price.Per.Ton <= 10000) %>%
   arrange(desc(District_Number)) %>%
@@ -93,7 +93,7 @@ gc %>%
 
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties 
 
-```{r, echo = FALSE, fig.width = 11}
+```{r, echo = FALSE, fig.width = 9}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
                    height = "675px")
