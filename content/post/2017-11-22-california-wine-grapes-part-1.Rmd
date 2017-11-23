@@ -85,13 +85,13 @@ gc %>%
                                  "#ffd92f",
                                  "#e5c494")) +
   theme_joy() +
-  xlab("Price, Dollars per Ton") +
-  ylab("Grape Pricing District")  
+  theme(axis.text=element_text(size=10)) +
+  xlab("Price, Dollars per Ton") 
 
 ```
 
 
-We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. 
+We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found [daniel-mikel.shinyapps.io](https://daniel-mikel.shinyapps.io/historic_california_grape_crush/)
 
 ```{r, echo = FALSE, fig.width = 9}
 
