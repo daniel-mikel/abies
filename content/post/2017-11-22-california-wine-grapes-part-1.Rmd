@@ -26,13 +26,13 @@ gc <- gc %>%
 
 ```
 
-```{r}
+```{r, fig.width = 8}
 head(gc[1:6], n = 10)
 ```
 
 We can see the distribution of tonnage within California's wine regions.
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 8}
 cols <- c("red" = "#F8766D", "white" = "#00BFC4", "raisin" = "#C77CFF", "table" = "#7CAE00", "all wine" = "#190B28")
 
 gc %>%
@@ -66,15 +66,12 @@ gc %>%
   theme(axis.text.x = element_text(angle = 30, hjust = 1))  
 ```
 
-We can also see a distribution of prices by district.
+We can also see a distribution of prices by district. We can see a sharp 
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 8}
 gc %>%
   filter(Base.Price.Per.Ton <= 10000) %>%
-  group_by(District_Number) %>%
-  mutate(m = mean(Base.Price.Per.Ton)) %>%
-  arrange(m) %>%
-  ungroup() %>%
+  arrange(desc(District_Number)) %>%
   mutate(label = factor(District_Disc, unique(District_Disc))) %>%
   ggplot(aes(x = Base.Price.Per.Ton, y = label, fill = label)) + 
   geom_joy(rel_min_height = 0.005, scale = 2,alpha = 0.5) +
@@ -88,7 +85,9 @@ gc %>%
                                  "#ffd92f",
                                  "#e5c494")) +
   theme_joy() +
-  xlab("Price, Dollars per Ton")
+  xlab("Price, Dollars per Ton") +
+  ylab("Grape Pricing District")  
+
 ```
 
 
