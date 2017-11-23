@@ -26,8 +26,8 @@ gc <- gc %>%
 
 ```
 
-```{r, fig.width = 9}
-head(gc[1:6], n = 10)
+```{r, echo = FALSE, results = 'asis'}
+knitr::kable(gc[1:5, 1:6])
 ```
 
 We can see the distribution of tonnage within California's wine regions.
@@ -66,7 +66,7 @@ gc %>%
   theme(axis.text.x = element_text(angle = 30, hjust = 1))  
 ```
 
-We can also see a distribution of prices by district. We can see a sharp 
+We can also see a distribution of prices by district. We can see a sharp difference between the higher production regions like Fresno, Madera, and North Tulare counties and the districts average weighted price. 
 
 ```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
 gc %>%
@@ -91,7 +91,7 @@ gc %>%
 ```
 
 
-We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties 
+We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. 
 
 ```{r, echo = FALSE, fig.width = 9}
 
