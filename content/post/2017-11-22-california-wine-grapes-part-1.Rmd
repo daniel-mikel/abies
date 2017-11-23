@@ -6,7 +6,7 @@ output: html_document
 runtime: shiny
 ---
 
-This is a draft
+!!!UNDER CONSTRUCTION!!!
 
 The [United States Department of Agriculture](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it's price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.
 
@@ -30,15 +30,45 @@ gc <- gc %>%
 head(gc[1:6], n = 10)
 ```
 
-insert bar graph of district tonnage here
+We can see the distribution of tonnage within California's wine regions.
 
-```{r}
-# bar chart of district tonnages goes here
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+cols <- c("red" = "#F8766D", "white" = "#00BFC4", "raisin" = "#C77CFF", "table" = "#7CAE00", "all wine" = "#190B28")
+
+gc %>%
+  filter(Year == 2016) %>%
+  group_by(District_Disc, District_Number, Type) %>%
+  summarise(Thousand_Tons = sum(Tons)/1000) %>%
+  arrange(District_Number) %>%
+  ggplot(aes(x = as.factor(District_Number), y = Thousand_Tons, fill = Type)) +
+  geom_col() + 
+  scale_fill_manual(values = cols) +
+  xlab(NULL) + 
+  ylab("Thousand Tons Sold") + 
+  scale_x_discrete(labels = c("1" = "[1] Mendocino",
+                              "2" = "[2] Lake",
+                              "3" = "[3] Sonoma",
+                              "4" = "[4] Napa",
+                              "5" = "[5] Solano",
+                              "6" = "[6] North Central Coast",
+                              "7" = "[7] Monterey and San Benito",
+                              "8" = "[8] San Luis Obispo",
+                              "9" = "[9] Northern California",
+                              "10" = "[10] Sierra Foothills",
+                              "11" = "[11] San Joaquin and Sacramento",
+                              "12" = "[12] San Joaquin, Stanislaus, Merced",
+                              "13" = "[13] Fresno, Madera, N. Tulare, Mono, Inyo",
+                              "14" = "[14] Kern, Kings, S. Tulare",
+                              "15" = "[15] L.A. and San Bernardino",
+                              "16" = "[16] So Cal",
+                              "17" = "[17] Yolo")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))  
 ```
 
-We can also see a distribution of prices by district. We can see that districts with lower prices have much less varience in the price than more expensive districts. (This might be better with just using a violen plot)
+We can also see a distribution of prices by district.
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 10}
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
 gc %>%
   filter(Base.Price.Per.Ton <= 10000) %>%
   group_by(District_Number) %>%
@@ -62,10 +92,9 @@ gc %>%
 ```
 
 
-
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties 
 
-```{r, echo = FALSE, fig.width = 10}
+```{r, echo = FALSE, fig.width = 11}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
                    height = "675px")

@@ -69,7 +69,7 @@
     
 
     <div class="article-content">
-      <p>This is a draft</p>
+      <p>!!!UNDER CONSTRUCTION!!!</p>
 <p>The <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">United States Department of Agriculture</a> publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it’s price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.</p>
 <pre class="r"><code>head(gc[1:6], n = 10)</code></pre>
 <pre><code>##       Variety Base.Price.Per.Ton Brix.Code  Tons Year   District
@@ -83,12 +83,12 @@
 ## 8  chardonnay              550.0     21200  46.7 2005 DISTRICT 1
 ## 9  chardonnay              600.0       100 145.4 2005 DISTRICT 1
 ## 10 chardonnay              600.0      9400  69.7 2005 DISTRICT 1</code></pre>
-<p>insert bar graph of district tonnage here</p>
-<pre class="r"><code># bar chart of district tonnages goes here</code></pre>
-<p>We can also see a distribution of prices by district. We can see that districts with lower prices have much less varience in the price than more expensive districts. (This might be better with just using a violen plot)</p>
-<p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
+<p>We can see the distribution of tonnage within California’s wine regions.</p>
+<p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-3-1.png" width="864" /></p>
+<p>We can also see a distribution of prices by district.</p>
+<p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-4-1.png" width="864" /></p>
 <p>We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties</p>
-<iframe src="https://daniel-mikel.shinyapps.io/gc_variety_embed/?showcase=0" width="960" height="675px">
+<iframe src="https://daniel-mikel.shinyapps.io/gc_variety_embed/?showcase=0" width="1056" height="675px">
 </iframe>
 
     </div>
