@@ -38,7 +38,7 @@ insert bar graph of district tonnage here
 
 We can also see a distribution of prices by district. We can see that districts with lower prices have much less varience in the price than more expensive districts. (This might be better with just using a violen plot)
 
-```{r, echo = FALSE, message = FALSE, fig.height = 8, fig.width = 10}
+```{r, echo = FALSE, message = FALSE, fig.height = 9, fig.width = 12}
 gc %>%
   filter(Base.Price.Per.Ton <= 10000) %>%
   group_by(District_Number) %>%
@@ -58,17 +58,16 @@ gc %>%
                                  "#ffd92f",
                                  "#e5c494")) +
   theme_joy() +
-  xlab("Price, Dollars per Ton") +
-  ylab("Grape Pricing District")  
+  xlab("Price, Dollars per Ton")
 ```
 
 We can even conduct exploritory analysis on 
 
 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.width = 10}
 
-knitr::include_app("https://daniel-mikel.shinyapps.io/historic_california_grape_crush/", 
+knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
                    height = "600px")
 
 ```
