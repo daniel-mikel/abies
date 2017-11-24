@@ -91,6 +91,36 @@ gc %>%
 
 ```
 
+Price between varieties seems pretty coorolated within districts between varieties, with red wine consistently outpricing white wine in each district
+
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+gc %>%
+  group_by(District_Disc, District_Number, Year, Type) %>%
+  filter(Type %in% c("red", "white")) %>%
+  summarize(Average_Price = sum(Base.Price.Per.Ton * Tons)/sum(Tons))  %>%
+  spread(Type, Average_Price) %>%
+  ggplot(aes(x = red, y = white)) +
+  geom_point() + 
+  geom_text(aes(label = District_Number), label.size = 2, hjust = 1, vjust = 1.5) +
+  geom_smooth(aes(group = 1), method = lm, se = FALSE, linetype = 2) +
+  theme_minimal()
+```
+
+We can also see that over time, as prices fluctuate over the years, the relationship between white and red wine prices stays consistent. Here we track the price in Sonoma County from 2005 to the present. We can see that while prices have changed considerably year over year, red wine has stayed abour 1.4x the price of white wine within the district
+
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+gc %>%
+  group_by(District_Disc, District_Number, Year, Type) %>%
+  filter(Type %in% c("red", "white")) %>%
+  summarize(Average_Price = sum(Base.Price.Per.Ton * Tons)/sum(Tons))  %>%
+  spread(Type, Average_Price) %>%
+  filter(District_Number == 3) %>%
+  ggplot(aes(x = red, y = white)) +
+  geom_point() + 
+  geom_text(aes(label = Year), label.size = 2, hjust = 1, vjust = 1.5) +
+  geom_smooth(aes(group = 1), method = lm, se = FALSE, linetype = 2) +
+  theme_minimal()     
+```
 
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found [daniel-mikel.shinyapps.io](https://daniel-mikel.shinyapps.io/historic_california_grape_crush/)
 
