@@ -19,6 +19,11 @@
 
 
 
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
 <link rel="stylesheet" href="/css/fonts.css" media="all">
 <link rel="stylesheet" href="/css/main.css" media="all">
 
@@ -54,7 +59,7 @@
 
   <article class="article">
     
-    <span class="article-duration">1 min read</span>
+    <span class="article-duration">2 min read</span>
     
 
     <h1 class="article-title">California Wine  - Part 1</h1>
@@ -124,6 +129,12 @@
 <p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-3-1.png" width="864" /></p>
 <p>We can also see a distribution of prices by district. We can see a sharp difference between the higher production regions like Fresno, Madera, and North Tulare counties and the districts average weighted price.</p>
 <p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-4-1.png" width="864" /></p>
+<p>Price between varieties seems pretty coorolated within districts between varieties, with red wine consistently outpricing white wine in each district</p>
+<pre><code>## Warning: Ignoring unknown parameters: label.size</code></pre>
+<p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-5-1.png" width="864" /></p>
+<p>We can also see that over time, as prices fluctuate over the years, the relationship between white and red wine prices stays consistent. Here we track the price in Sonoma County from 2005 to the present. We can see that while prices have changed considerably year over year, red wine has stayed abour 1.4x the price of white wine within the district</p>
+<pre><code>## Warning: Ignoring unknown parameters: label.size</code></pre>
+<p><img src="/post/2017-11-22-california-wine-grapes-part-1_files/figure-html/unnamed-chunk-6-1.png" width="864" /></p>
 <p>We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found <a href="https://daniel-mikel.shinyapps.io/historic_california_grape_crush/">daniel-mikel.shinyapps.io</a></p>
 <iframe src="https://daniel-mikel.shinyapps.io/gc_variety_embed/?showcase=0" width="864" height="675px">
 </iframe>
@@ -149,6 +160,18 @@
 
     </div>
     
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
 
     
 
