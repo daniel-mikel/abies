@@ -1,0 +1,66 @@
+---
+title: "Cleaning Data"
+author: "Daniel Mikel"
+date: "2017-11-27T21:13:14-05:00"
+output: html_document
+---
+
+Cleaning data feels like doing someone else's homework. I would say cleaning the data has probably been the biggest challenge of this project so far. It has required some technical growth (though building my first Shiny Apps would probably be a bigger achievement) but most of the challenge has been keeping focused on cleaning the data so I could do something with it. No clean data means no playing with ggplot2 and no building shiny apps. I'm posting how I worked through this dataset in the hope that I can spare someone the monotony of cleaning similarly structured data. I can't imagine there is any other reason for someone to read through this.
+
+The data is hosted at the [United States Department of Agriculture](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/). You can download the annual reports as a .pdf or as a zip file in .xls format. The report itself has the data summarized in a variety of ways in various tables, the table we are interested in is Section 8, which has grape varietal prices and tonnages by pricing district at the individual grape contract level. This is a pretty sweet level of aggregation for later exploritory analysis, made all the sweeter by how terribly structured it is for vectorized programing. Let's load our packages and take a look at what we're working with.
+
+```{r, message = FALSE}
+library("tidyverse")
+library("plyr")
+library("stringr")
+library("gdata")
+```
+
+I've loaded library("gdata") for the read.xls() function, library("tidyverse") mostly out of habit but also for dplyr joins, library("stringr") will be used later for manipulating character vectors, and libary("plyr") for some apply() functions that don't come with base R. I've saved all of the .xls files from [The USDA](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) and put all of the section 8 files in their own folder. There are over 17,000 rows of data, so we'll just look at the first 15
+
+```{r, echo = FALSE, results = 'asis', fig.width = 9}
+gc2016 <- read.xls("/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/gc2016.xls")
+names(gc2016) <- c("District, Type, and Variety", "Base Price Per Ton", "NA", "Brix Factors", "Tons")
+
+knitr::kable(gc2016[2:16,1:5])
+```
+
+A few things come to mind:
+
+* **Years** Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet o fdata from the same year. This isn't a big deal, but will require intervention on our part before we combind multiple years of data
+
+* **The Variety Column** The first column has a lot of information in it, too much maybe for our convenience. The wine district, the wine type, and the wine variety, and various sums are all within this column. This will require a great deal more work on our part.
+
+* **Empty Cells** There are a few rows with empty cells, sometimes used as white space for aesthetics or to seperate rows
+
+I started by solving the first problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.
+
+```{r}
+
+# turn off R and just display the code
+
+to_xls <- "/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/"
+
+
+files <- list.files(path = to_xls, full.names = TRUE)
+files
+
+Make_Year <- function(folder){
+	files <- list.files(path = folder, full.names = TRUE)
+	for(i in 1:length(files)){
+		curr_year <- gsub(folder, "", files[i])
+		curr_year <- gsub("/gc", "", curr_year)
+		curr_year <- gsub(".xls", "", curr_year)
+		print(curr_year)
+		data <- read.xls(files[i])
+		names(data) <- c("Variety", "Base.Price.Per.Ton", "Trash", "Brix.Code", "Tons")
+		data$Year <- curr_year
+		write.csv(data, 
+			paste0("/home/dan/Data/NASS/Grape_Crush/all_section_8/clean_csv/gc", curr_year, ".csv"),
+			row.names = FALSE)
+	}
+}
+
+# Make_Year(to_xls)
+```
+

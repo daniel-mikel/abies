@@ -6,8 +6,6 @@ output: html_document
 runtime: shiny
 ---
 
-!!!UNDER CONSTRUCTION!!!
-
 The [United States Department of Agriculture](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it's price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.
 
 ```{r, message = FALSE, echo = FALSE}
@@ -17,12 +15,8 @@ library(tidyverse)
 library(knitr)
 
 gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
-district_key <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/district_key.csv")
 gc$District_Number <- as.factor(gc$District_Number)
-district_key$District_Number <- as.factor(district_key$District_Number)
 
-gc <- gc %>%
-  left_join(district_key)
 
 ```
 
@@ -62,8 +56,17 @@ gc %>%
                               "15" = "[15] L.A. and San Bernardino",
                               "16" = "[16] So Cal",
                               "17" = "[17] Yolo")) +
+  ggtitle("Grape Production in Tons by District") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))  
+```
+
+And can see which districts grow which varieties
+
+```{r, echo = FALSE, fig.width = 9}
+
+# knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", height = "675px")
+
 ```
 
 We can also see a distribution of prices by district. We can see a sharp difference between the higher production regions like Fresno, Madera, and North Tulare counties and the districts average weighted price. 
@@ -84,6 +87,7 @@ gc %>%
                                  "#a6d854",
                                  "#ffd92f",
                                  "#e5c494")) +
+  ggtitle("Histograms of Grape Prices by District") +
   theme_joy() +
   theme(axis.text=element_text(size=10)) +
   xlab("Price, Dollars per Ton") +
@@ -101,8 +105,9 @@ gc %>%
   spread(Type, Average_Price) %>%
   ggplot(aes(x = red, y = white)) +
   geom_point() + 
-  geom_text(aes(label = District_Number), label.size = 2, hjust = 1, vjust = 1.5) +
+  geom_text(aes(label = District_Number), hjust = 1, vjust = 1.5) +
   geom_smooth(aes(group = 1), method = lm, se = FALSE, linetype = 2) +
+  ggtitle("Red and White Grower Return Prices, Weighted Dollars per Ton") +
   theme_minimal()
 ```
 
@@ -117,8 +122,57 @@ gc %>%
   filter(District_Number == 3) %>%
   ggplot(aes(x = red, y = white)) +
   geom_point() + 
-  geom_text(aes(label = Year), label.size = 2, hjust = 1, vjust = 1.5) +
+  geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
   geom_smooth(aes(group = 1), method = lm, se = FALSE, linetype = 2) +
+  ggtitle("Historic Red and White Grower Return Prices for Napa County, Weighted Dollars per Ton") +
+  theme_minimal()     
+```
+
+This  can be seen across many California Wine Districts.
+
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+gc %>%
+  group_by(District_Disc, District_Number, Year, Type) %>%
+  filter(Type %in% c("red", "white")) %>%
+  summarize(Average_Price = sum(Base.Price.Per.Ton * Tons)/sum(Tons))  %>%
+  spread(Type, Average_Price) %>%
+  filter(District_Number %in% c(1:4, 16)) %>%
+  ggplot(aes(x = red, y = white, color = District_Number)) +
+  geom_point() + 
+  # geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
+  geom_smooth(method = lm, se = FALSE, linetype = 2) +
+  ggtitle("Historic Red and White Grower Return Prices By District, Weighted Dollars per Ton") +
+  theme_minimal()     
+```
+
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+gc %>%
+  group_by(District_Disc, District_Number, Year, Type) %>%
+  filter(Type %in% c("red", "white")) %>%
+  summarize(Average_Price = sum(Base.Price.Per.Ton * Tons)/sum(Tons))  %>%
+  spread(Type, Average_Price) %>%
+  filter(District_Number %in% c(5, 7,9, 11:14, 17)) %>%
+  ggplot(aes(x = red, y = white, color = District_Number)) +
+  geom_point() + 
+  # geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
+  geom_smooth(method = lm, se = FALSE, linetype = 2) +
+  ggtitle("Historic Red and White Grower Return Prices By District, Weighted Dollars per Ton") +
+  theme_minimal()  
+```
+
+But is not necessarily present in every district
+```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+gc %>%
+  group_by(District_Disc, District_Number, Year, Type) %>%
+  filter(Type %in% c("red", "white")) %>%
+  summarize(Average_Price = sum(Base.Price.Per.Ton * Tons)/sum(Tons))  %>%
+  spread(Type, Average_Price) %>%
+  filter(District_Number %in% c(6, 8, 10, 15)) %>%
+  ggplot(aes(x = red, y = white, color = District_Number)) +
+  geom_point() + 
+  # geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
+  geom_smooth(method = lm, se = FALSE, linetype = 2) +
+  ggtitle("Historic Red and White Grower Return Prices By District, Weighted Dollars per Ton") +
   theme_minimal()     
 ```
 

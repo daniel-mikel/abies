@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.31" />
+
+
+<title>Cleaning Data - Abies</title>
+<meta property="og:title" content="Cleaning Data - Abies">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/daniel-mikel">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/dmikel2010">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">4 min read</span>
+    
+
+    <h1 class="article-title">Cleaning Data</h1>
+
+    
+    <span class="article-date">2017/11/27</span>
+    
+
+    <div class="article-content">
+      <p>Cleaning data feels like doing someone else’s homework. I would say cleaning the data has probably been the biggest challenge of this project so far. It has required some technical growth (though building my first Shiny Apps would probably be a bigger achievement) but most of the challenge has been keeping focused on cleaning the data so I could do something with it. No clean data means no playing with ggplot2 and no building shiny apps. I’m posting how I worked through this dataset in the hope that I can spare someone the monotony of cleaning similarly structured data. I can’t imagine there is any other reason for someone to read through this.</p>
+<p>The data is hosted at the <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">United States Department of Agriculture</a>. You can download the annual reports as a .pdf or as a zip file in .xls format. The report itself has the data summarized in a variety of ways in various tables, the table we are interested in is Section 8, which has grape varietal prices and tonnages by pricing district at the individual grape contract level. This is a pretty sweet level of aggregation for later exploritory analysis, made all the sweeter by how terribly structured it is for vectorized programing. Let’s load our packages and take a look at what we’re working with.</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;plyr&quot;)
+library(&quot;stringr&quot;)
+library(&quot;gdata&quot;)</code></pre>
+<p>I’ve loaded library(“gdata”) for the read.xls() function, library(“tidyverse”) mostly out of habit but also for dplyr joins, library(“stringr”) will be used later for manipulating character vectors, and libary(“plyr”) for some apply() functions that don’t come with base R. I’ve saved all of the .xls files from <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">The USDA</a> and put all of the section 8 files in their own folder. There are over 17,000 rows of data, so we’ll just look at the first 15</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">District, Type, and Variety</th>
+<th align="left">Base Price Per Ton</th>
+<th align="left">NA</th>
+<th align="left">Brix Factors</th>
+<th align="left">Tons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td align="left"></td>
+<td align="left">Dollars</td>
+<td align="left">NA</td>
+<td align="left">Code a/</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td align="left">DISTRICT 1</td>
+<td align="left"></td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td align="left">WINE GRAPES (WHITE)</td>
+<td align="left"></td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td align="left">Albarino</td>
+<td align="left">2,800.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">1.3</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td align="left"></td>
+<td align="left">3,200.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">1.3</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td align="left">Wtd. Avg. Base &amp; Total Tons</td>
+<td align="left">3,000.00</td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left">2.6</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td align="left">Arneis</td>
+<td align="left">1,500.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">2.8</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td align="left"></td>
+<td align="left">1,700.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">6.2</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td align="left"></td>
+<td align="left">1,850.00</td>
+<td align="left">NA</td>
+<td align="left">018800</td>
+<td align="left">3.9</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td align="left">Wtd. Avg. Base &amp; Total Tons</td>
+<td align="left">1,701.94</td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left">12.9</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td align="left">Chardonnay *</td>
+<td align="left">275.00</td>
+<td align="left">NA</td>
+<td align="left">009400</td>
+<td align="left">90.8</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td align="left"></td>
+<td align="left">500.00</td>
+<td align="left">NA</td>
+<td align="left">050773</td>
+<td align="left">6.9</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td align="left"></td>
+<td align="left">900.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">119.8</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td align="left"></td>
+<td align="left">913.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">84.9</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td align="left"></td>
+<td align="left">950.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">49.0</td>
+</tr>
+</tbody>
+</table>
+<p>A few things come to mind:</p>
+<ul>
+<li><p><strong>Years</strong> Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet o fdata from the same year. This isn’t a big deal, but will require intervention on our part before we combind multiple years of data</p></li>
+<li><p><strong>The Variety Column</strong> The first column has a lot of information in it, too much maybe for our convenience. The wine district, the wine type, and the wine variety, and various sums are all within this column. This will require a great deal more work on our part.</p></li>
+<li><p><strong>Empty Cells</strong> There are a few rows with empty cells, sometimes used as white space for aesthetics or to seperate rows</p></li>
+</ul>
+<p>I started by solving the first problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.</p>
+<pre class="r"><code># turn off R and just display the code
+
+to_xls &lt;- &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/&quot;
+
+
+files &lt;- list.files(path = to_xls, full.names = TRUE)
+files</code></pre>
+<pre><code>##  [1] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2005.xls&quot;
+##  [2] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2006.xls&quot;
+##  [3] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2007.xls&quot;
+##  [4] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2008.xls&quot;
+##  [5] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2009.xls&quot;
+##  [6] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2010.xls&quot;
+##  [7] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2011.xls&quot;
+##  [8] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2012.xls&quot;
+##  [9] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2013.xls&quot;
+## [10] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2014.xls&quot;
+## [11] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2015.xls&quot;
+## [12] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2016.xls&quot;</code></pre>
+<pre class="r"><code>Make_Year &lt;- function(folder){
+    files &lt;- list.files(path = folder, full.names = TRUE)
+    for(i in 1:length(files)){
+        curr_year &lt;- gsub(folder, &quot;&quot;, files[i])
+        curr_year &lt;- gsub(&quot;/gc&quot;, &quot;&quot;, curr_year)
+        curr_year &lt;- gsub(&quot;.xls&quot;, &quot;&quot;, curr_year)
+        print(curr_year)
+        data &lt;- read.xls(files[i])
+        names(data) &lt;- c(&quot;Variety&quot;, &quot;Base.Price.Per.Ton&quot;, &quot;Trash&quot;, &quot;Brix.Code&quot;, &quot;Tons&quot;)
+        data$Year &lt;- curr_year
+        write.csv(data, 
+            paste0(&quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/clean_csv/gc&quot;, curr_year, &quot;.csv&quot;),
+            row.names = FALSE)
+    }
+}
+
+# Make_Year(to_xls)</code></pre>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
