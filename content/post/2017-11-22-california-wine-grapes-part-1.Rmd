@@ -65,7 +65,7 @@ And can see which districts grow which varieties
 
 ```{r, echo = FALSE, fig.width = 9}
 
-# knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", height = "675px")
+knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", height = "675px")
 
 ```
 
