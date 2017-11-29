@@ -59,7 +59,7 @@
 
   <article class="article">
     
-    <span class="article-duration">4 min read</span>
+    <span class="article-duration">6 min read</span>
     
 
     <h1 class="article-title">Cleaning Data</h1>
@@ -69,8 +69,18 @@
     
 
     <div class="article-content">
-      <p>Cleaning data feels like doing someone else’s homework. I would say cleaning the data has probably been the biggest challenge of this project so far. It has required some technical growth (though building my first Shiny Apps would probably be a bigger achievement) but most of the challenge has been keeping focused on cleaning the data so I could do something with it. No clean data means no playing with ggplot2 and no building shiny apps. I’m posting how I worked through this dataset in the hope that I can spare someone the monotony of cleaning similarly structured data. I can’t imagine there is any other reason for someone to read through this.</p>
-<p>The data is hosted at the <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">United States Department of Agriculture</a>. You can download the annual reports as a .pdf or as a zip file in .xls format. The report itself has the data summarized in a variety of ways in various tables, the table we are interested in is Section 8, which has grape varietal prices and tonnages by pricing district at the individual grape contract level. This is a pretty sweet level of aggregation for later exploritory analysis, made all the sweeter by how terribly structured it is for vectorized programing. Let’s load our packages and take a look at what we’re working with.</p>
+      <div id="california-wine" class="section level2">
+<h2>California Wine</h2>
+<p>The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">United States Department of Agriculture’s Grape Crush Report</a> which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.</p>
+<div class="figure">
+<img src="/home/dan/Data/NASS/Grape_Crush/pictures/Screenshot%20from%202017-11-28%2020-33-12.png" alt="California Grape Price Districts Image" />
+<p class="caption">California Grape Price Districts Image</p>
+</div>
+<p>This California Wine has some interesting potential for future projects. On a personal level it will be good to practice to work with a real data set, and it’s not like wine is completely unrelatable (even if I’m more of a beer person). It also presents fodder for furthering the project, ideas like scraping winery and wine sales to analyze mark up prices, or modeling price and production based on rainfall and temperture are some feasible next steps I could take this data. Even working just with the price and production data from the Grape Crush Report will give me practice cleaning data, working with tidyr and dplyr to manipulate a large dataset, and using ggplot2 and shiny to visualize data.</p>
+</div>
+<div id="first-look-at-the-data" class="section level2">
+<h2>First look at the data</h2>
+<p>Cleaning data feels like doing someone else’s homework. Here are the packages I’ll be working with:</p>
 <pre class="r"><code>library(&quot;tidyverse&quot;)
 library(&quot;plyr&quot;)
 library(&quot;stringr&quot;)
@@ -210,39 +220,23 @@ library(&quot;gdata&quot;)</code></pre>
 </tr>
 </tbody>
 </table>
-<p>A few things come to mind:</p>
+<p>A few things now come to mind:</p>
 <ul>
-<li><p><strong>Years</strong> Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet o fdata from the same year. This isn’t a big deal, but will require intervention on our part before we combind multiple years of data</p></li>
-<li><p><strong>The Variety Column</strong> The first column has a lot of information in it, too much maybe for our convenience. The wine district, the wine type, and the wine variety, and various sums are all within this column. This will require a great deal more work on our part.</p></li>
-<li><p><strong>Empty Cells</strong> There are a few rows with empty cells, sometimes used as white space for aesthetics or to seperate rows</p></li>
+<li><p><strong>Tidiness</strong> Each row corresponds to single grape contract in a given district with the grapes variety and the contracts volume (in tons). For a human this data is pretty easy to interpret but for a vectorized program this data will take considerable work in order to manipulate efficiently.</p></li>
+<li><p><strong>Years</strong> Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet of data from the same year. We’ll need to add the years to the datasets before we combine them with eachother.</p></li>
+<li><p><strong>The Variety Column</strong> The first column has a lot of information in it, too much even! The wine district, the wine type, and the wine variety, and various sums are all within this column. We’ll need to split the data include in this column out, as much of the information refers to later observations, and uses titles and whitespace within the column to give information about the data itself. We’ll need to draw out the extra data into it’s own columns in order to process this with R.</p></li>
 </ul>
-<p>I started by solving the first problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.</p>
-<pre class="r"><code># turn off R and just display the code
-
-to_xls &lt;- &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/&quot;
-
+<p>Let’s start by solving the second problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.</p>
+<pre class="r"><code>to_xls &lt;- &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/&quot;
 
 files &lt;- list.files(path = to_xls, full.names = TRUE)
-files</code></pre>
-<pre><code>##  [1] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2005.xls&quot;
-##  [2] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2006.xls&quot;
-##  [3] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2007.xls&quot;
-##  [4] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2008.xls&quot;
-##  [5] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2009.xls&quot;
-##  [6] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2010.xls&quot;
-##  [7] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2011.xls&quot;
-##  [8] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2012.xls&quot;
-##  [9] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2013.xls&quot;
-## [10] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2014.xls&quot;
-## [11] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2015.xls&quot;
-## [12] &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls//gc2016.xls&quot;</code></pre>
-<pre class="r"><code>Make_Year &lt;- function(folder){
+
+Make_Year &lt;- function(folder){
     files &lt;- list.files(path = folder, full.names = TRUE)
     for(i in 1:length(files)){
         curr_year &lt;- gsub(folder, &quot;&quot;, files[i])
         curr_year &lt;- gsub(&quot;/gc&quot;, &quot;&quot;, curr_year)
         curr_year &lt;- gsub(&quot;.xls&quot;, &quot;&quot;, curr_year)
-        print(curr_year)
         data &lt;- read.xls(files[i])
         names(data) &lt;- c(&quot;Variety&quot;, &quot;Base.Price.Per.Ton&quot;, &quot;Trash&quot;, &quot;Brix.Code&quot;, &quot;Tons&quot;)
         data$Year &lt;- curr_year
@@ -252,7 +246,436 @@ files</code></pre>
     }
 }
 
-# Make_Year(to_xls)</code></pre>
+Make_Year(to_xls)</code></pre>
+</div>
+<div id="building-a-dictionary-for-wine-varieties-and-districts" class="section level2">
+<h2>Building a dictionary for wine varieties and districts</h2>
+<p>At some point in the data cleaning process, we’re going to need a way to parse the unneeded rows in the dataset from the rows with data we want to keep. We can either do this by:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>excluding all the rows we don’t need or</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>finding a way to lift out all the rows we want.</li>
+</ol></li>
+</ul>
+<p>Since we’re going to be processing multiple Section 8’s over a long period of time from the dataset, and since we can’t assume that this data has all been processed excactly the same way (the files could and probably were loaded in the year the report was published, giving 13 years for potential changes in processes). Some of the rows even include footnotes, and since going through 150,000 rows of data looking for each unique string of characters I don’t want seems a little inefficient, I think (2) will be the safer assumption.</p>
+<p>Section 8 is what we want, but we’ll start with another section to pull out a list of wine varieties included in the dataset. Section 2 is less than 200 rows long, and each unique variety has it’s own row.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">TABLE.2…TONS.OF.GRAPES.CRUSHED.BY.CALIFORNIA.PROCESSORS</th>
+<th align="left">X</th>
+<th align="left">X.1</th>
+<th align="left">X.2</th>
+<th align="left">X.3</th>
+<th align="left">X.4</th>
+<th align="left">X.5</th>
+<th align="left">X.6</th>
+<th align="left">X.7</th>
+<th align="left">X.8</th>
+<th align="left">X.9</th>
+<th align="left">TABLE.2…TONS.OF.GRAPES.CRUSHED.BY.CALIFORNIA.PROCESSORS.1</th>
+<th align="left">X.10</th>
+<th align="left">X.11</th>
+<th align="left">X.12</th>
+<th align="left">X.13</th>
+<th align="right">X.14</th>
+<th align="left">X.15</th>
+<th align="left">X.16</th>
+<th align="left">X.17</th>
+<th align="left">X.18</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td align="left">Type and Variety</td>
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">3</td>
+<td align="left">4</td>
+<td align="left">5</td>
+<td align="left">6</td>
+<td align="left">7</td>
+<td align="left">8</td>
+<td align="left">9</td>
+<td align="left">10</td>
+<td align="left">Type and Variety</td>
+<td align="left">11</td>
+<td align="left">12</td>
+<td align="left">13</td>
+<td align="left">14</td>
+<td align="right">15</td>
+<td align="left">16</td>
+<td align="left">17</td>
+<td align="left">2016 State Total</td>
+<td align="left">2015 State Total</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td align="left"></td>
+<td align="left">Tons</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">Tons</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td align="left">RAISIN GRAPES:</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">RAISIN GRAPES:</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td align="left">Fiesta</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Fiesta</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">11,448.0</td>
+<td align="left">1,349.9</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">12,797.9</td>
+<td align="left">14,004.8</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td align="left">Thompson Seedless</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">2.0</td>
+<td align="left">0.0</td>
+<td align="left">1,794.7</td>
+<td align="left">Thompson Seedless</td>
+<td align="left">0.5</td>
+<td align="left">99.9</td>
+<td align="left">53,983.2</td>
+<td align="left">21,451.2</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">77,331.5</td>
+<td align="left">78,421.9</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td align="left">Other Raisin 1/</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Other Raisin 1/</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">5.1</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">5.1</td>
+<td align="left">4.9</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td align="left">Total Raisin</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">2.0</td>
+<td align="left">0.0</td>
+<td align="left">1,794.7</td>
+<td align="left">Total Raisin</td>
+<td align="left">0.5</td>
+<td align="left">99.9</td>
+<td align="left">65,436.3</td>
+<td align="left">22,801.1</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">90,134.5</td>
+<td align="left">92,431.6</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td align="left">TABLE GRAPES:</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">TABLE GRAPES:</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td align="left">Allison</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Allison</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">62.3</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">62.3</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td align="left">Autumn King</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Autumn King</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">61.4</td>
+<td align="left">7,706.3</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">7,767.7</td>
+<td align="left">9,136.5</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td align="left">Autumn Royal</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Autumn Royal</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">69.6</td>
+<td align="left">3,709.1</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">3,778.7</td>
+<td align="left">2,883.7</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td align="left">Beauty Seedless *</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Beauty Seedless *</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">93.1</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td align="left">Black Monukka</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Black Monukka</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">89.5</td>
+</tr>
+<tr class="even">
+<td>17</td>
+<td align="left">Blanc Seedless</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">Blanc Seedless</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">1,459.1</td>
+</tr>
+</tbody>
+</table>
+</div>
 
     </div>
   </article>

@@ -5,9 +5,17 @@ date: "2017-11-27T21:13:14-05:00"
 output: html_document
 ---
 
-Cleaning data feels like doing someone else's homework. I would say cleaning the data has probably been the biggest challenge of this project so far. It has required some technical growth (though building my first Shiny Apps would probably be a bigger achievement) but most of the challenge has been keeping focused on cleaning the data so I could do something with it. No clean data means no playing with ggplot2 and no building shiny apps. I'm posting how I worked through this dataset in the hope that I can spare someone the monotony of cleaning similarly structured data. I can't imagine there is any other reason for someone to read through this.
+## California Wine
 
-The data is hosted at the [United States Department of Agriculture](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/). You can download the annual reports as a .pdf or as a zip file in .xls format. The report itself has the data summarized in a variety of ways in various tables, the table we are interested in is Section 8, which has grape varietal prices and tonnages by pricing district at the individual grape contract level. This is a pretty sweet level of aggregation for later exploritory analysis, made all the sweeter by how terribly structured it is for vectorized programing. Let's load our packages and take a look at what we're working with.
+The first project I'm going to work on is with California Wine Grape Data. The data we'll start with is hosted by the [United States Department of Agriculture's Grape Crush Report](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract. 
+
+![California Grape Price Districts Image](/home/dan/Data/NASS/Grape_Crush/pictures/Screenshot from 2017-11-28 20-33-12.png)
+
+This California Wine has some interesting potential for future projects. On a personal level it will be good to practice to work with a real data set, and it's not like wine is completely unrelatable (even if I'm more of a beer person). It also presents fodder for furthering the project, ideas like scraping winery and wine sales to analyze mark up prices, or modeling price and production based on rainfall and temperture are some feasible next steps I could take this data. Even working just with the price and production data from the Grape Crush Report will give me practice cleaning data, working with tidyr and dplyr to manipulate a large dataset, and using ggplot2 and shiny to visualize data. 
+
+## First look at the data
+
+Cleaning data feels like doing someone else's homework. Here are the packages I'll be working with:
 
 ```{r, message = FALSE}
 library("tidyverse")
@@ -25,25 +33,20 @@ names(gc2016) <- c("District, Type, and Variety", "Base Price Per Ton", "NA", "B
 knitr::kable(gc2016[2:16,1:5])
 ```
 
-A few things come to mind:
+A few things now come to mind:
 
-* **Years** Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet o fdata from the same year. This isn't a big deal, but will require intervention on our part before we combind multiple years of data
+* **Tidiness** Each row corresponds to single grape contract in a given district with the grapes variety and the contracts volume (in tons). For a human this data is pretty easy to interpret but for a vectorized program this data will take considerable work in order to manipulate efficiently. 
 
-* **The Variety Column** The first column has a lot of information in it, too much maybe for our convenience. The wine district, the wine type, and the wine variety, and various sums are all within this column. This will require a great deal more work on our part.
+* **Years** Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet of data from the same year. We'll need to add the years to the datasets before we combine them with eachother.
 
-* **Empty Cells** There are a few rows with empty cells, sometimes used as white space for aesthetics or to seperate rows
+* **The Variety Column** The first column has a lot of information in it, too much even! The wine district, the wine type, and the wine variety, and various sums are all within this column. We'll need to split the data include in this column out, as much of the information refers to later observations, and uses titles and whitespace within the column to give information about the data itself. We'll need to draw out the extra data into it's own columns in order to process this with R. 
 
-I started by solving the first problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.
+Let's start by solving the second problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.
 
-```{r}
-
-# turn off R and just display the code
-
+```{r, eval=FALSE}
 to_xls <- "/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/"
 
-
 files <- list.files(path = to_xls, full.names = TRUE)
-files
 
 Make_Year <- function(folder){
 	files <- list.files(path = folder, full.names = TRUE)
@@ -51,7 +54,6 @@ Make_Year <- function(folder){
 		curr_year <- gsub(folder, "", files[i])
 		curr_year <- gsub("/gc", "", curr_year)
 		curr_year <- gsub(".xls", "", curr_year)
-		print(curr_year)
 		data <- read.xls(files[i])
 		names(data) <- c("Variety", "Base.Price.Per.Ton", "Trash", "Brix.Code", "Tons")
 		data$Year <- curr_year
@@ -61,6 +63,24 @@ Make_Year <- function(folder){
 	}
 }
 
-# Make_Year(to_xls)
+Make_Year(to_xls)
+```
+
+## Building a dictionary for wine varieties and districts
+
+At some point in the data cleaning process, we're going to need a way to parse the unneeded rows in the dataset from the rows with data we want to keep. We can either do this by:
+
+* (1) excluding all the rows we don't need or 
+
+* (2) finding a way to lift out all the rows we want. 
+
+Since we're going to be processing multiple Section 8's over a long period of time from the dataset, and since we can't assume that this data has all been processed excactly the same way (the files could and probably were loaded in the year the report was published, giving 13 years for potential changes in processes). Some of the rows even include footnotes, and since going through 150,000 rows of data looking for each unique string of characters I don't want seems a little inefficient, I think (2) will be the safer assumption. 
+
+Section 8 is what we want, but we'll start with another section to pull out a list of wine varieties included in the dataset. Section 2 is less than 200 rows long, and each unique variety has it's own row. 
+
+```{r, echo = FALSE, results = 'asis', fig.width = 9}
+sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
+
+knitr::kable(sec2[2:17,])
 ```
 

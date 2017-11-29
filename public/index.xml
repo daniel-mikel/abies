@@ -6,10 +6,19 @@
     <description>Recent content on Abies</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 27 Nov 2017 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Tue, 28 Nov 2017 21:13:14 -0500</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>California Wine  - Part 1</title>
+      <link>/2017/11/28/california-wine----part-1/</link>
+      <pubDate>Tue, 28 Nov 2017 21:13:14 -0500</pubDate>
+      
+      <guid>/2017/11/28/california-wine----part-1/</guid>
+      <description>The United States Department of Agriculture publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it’s price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.</description>
+    </item>
     
     <item>
       <title>Cleaning Data</title>
@@ -17,16 +26,8 @@
       <pubDate>Mon, 27 Nov 2017 21:13:14 -0500</pubDate>
       
       <guid>/2017/11/27/cleaning-data/</guid>
-      <description>Cleaning data feels like doing someone else’s homework. I would say cleaning the data has probably been the biggest challenge of this project so far. It has required some technical growth (though building my first Shiny Apps would probably be a bigger achievement) but most of the challenge has been keeping focused on cleaning the data so I could do something with it. No clean data means no playing with ggplot2 and no building shiny apps.</description>
-    </item>
-    
-    <item>
-      <title>California Wine  - Part 1</title>
-      <link>/2017/11/23/california-wine----part-1/</link>
-      <pubDate>Thu, 23 Nov 2017 21:13:14 -0500</pubDate>
-      
-      <guid>/2017/11/23/california-wine----part-1/</guid>
-      <description>The United States Department of Agriculture publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it’s price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.</description>
+      <description>California Wine The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the United States Department of Agriculture’s Grape Crush Report which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.
+California Grape Price Districts Image</description>
     </item>
     
     <item>
