@@ -80,7 +80,8 @@ Section 8 is what we want, but we'll start with another section to pull out a li
 
 ```{r, echo = FALSE, results = 'asis', fig.width = 9}
 sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
+sec2 <- sec2[c(2, 4:nrow(sec2)),c(1:11, 13:19)]
 
-knitr::kable(sec2[2:17,])
+knitr::kable(sec2)
 ```
 
