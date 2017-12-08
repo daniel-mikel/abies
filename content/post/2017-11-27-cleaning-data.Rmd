@@ -234,7 +234,7 @@ gc <- gc %>%
 
 And we've got our data!
 
-```{r, echo = FALSE, results = 'asis', fig.width = 9}
+```{r, echo = FALSE, results = 'asis', fig.width = 10}
 gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
 knitr::kable(head(gc, n = 20))
 ```
