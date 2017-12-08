@@ -194,7 +194,7 @@ Make_Year(to_xls)</code></pre>
 <li>excluding all the rows we don’t need or</li>
 </ol></li>
 <li><ol start="2" style="list-style-type: decimal">
-<li>finding a way to lift out all the rows we want.</li>
+<li>finding a way to lift out the rows we want.</li>
 </ol></li>
 </ul>
 <p>Since we’re going to be processing multiple Section 8’s over a long period of time from the dataset, and since we can’t assume that this data has all been processed excactly the same way (the files could and probably were loaded in the year the report was published, giving 13 years for potential changes in processes). Some of the rows even include footnotes, and since going through 150,000 rows of data looking for each unique string of characters I don’t want seems a little inefficient, I think (2) will be the safer assumption.</p>
@@ -583,4 +583,499 @@ Make_Year(to_xls)</code></pre>
 </tr>
 </tbody>
 </table>
+<p>We only want data from the first column, since that’s where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.</p>
+<pre class="r"><code>print(sec2[c(5:7,12:45,50:94,99:162),c(1)])</code></pre>
+<pre><code>##   [1] Fiesta                   Thompson Seedless       
+##   [3] Other Raisin  1/         Allison                 
+##   [5] Autumn King              Autumn Royal            
+##   [7] Beauty Seedless *        Black Monukka           
+##   [9] Blanc Seedless           Calmeria                
+##  [11] Christmas Rose           Cotton Candy            
+##  [13] Crimson Seedless *       Emerald Seedless *      
+##  [15] Emperor                  Fantasy Seedless        
+##  [17] Flame Seedless *         Flame Tokay             
+##  [19] Italia *                 Krissy                  
+##  [21] Malaga *                 Perlette                
+##  [23] Princess *               Pristine                
+##  [25] Red Globe *              Ribier                  
+##  [27] Rouge                    Ruby Seedless *         
+##  [29] Scarlet                  Scarlet Royal           
+##  [31] Sugraone *               Summer Royal            
+##  [33] Sweet Scarlet            Sweet Sunshine          
+##  [35] Timco                    Vintage Red             
+##  [37] Other Table  1/          Albarino                
+##  [39] Arneis                   Burger *                
+##  [41] Chardonnay *             Chenin Blanc            
+##  [43] Cortese                  Fiano                   
+##  [45] Flora                    Folle Blanche           
+##  [47] French Colombard         Gewurztraminer          
+##  [49] Gray Riesling *          Grenache Blanc          
+##  [51] Gruner Veltliner         Malvasia Bianca         
+##  [53] Marsanne                 Melon                   
+##  [55] Moscato Gaillo *         Muscat Blanc *          
+##  [57] Muscat Orange            Muscat of Alexandria    
+##  [59] Palomino *               Pecorino                
+##  [61] Picpoul Blanc            Pinot Blanc             
+##  [63] Pinot Gris *             Ribolla Gialla *        
+##  [65] Roussanne                Sauvignon Blanc         
+##  [67] Sauvignon Musque         Sauvignon Vert *        
+##  [69] Semillon                 St. Emilion *           
+##  [71] Sylvaner                 Symphony                
+##  [73] Tocai Friulano           Torrontes               
+##  [75] Triplett Blanc           Verdejo                 
+##  [77] Verdelho                 Vermentino *            
+##  [79] Vernaccia                Viognier                
+##  [81] White Riesling *         Other White  1/         
+##  [83] Aglianico                Aleatico                
+##  [85] Alicante Bouschet *      Arinarnoa               
+##  [87] Barbera                  Blaufraenkisch *        
+##  [89] Cabernet Franc           Cabernet Sauvignon      
+##  [91] Carignane                Carmenere               
+##  [93] Carnelian                Centurian               
+##  [95] Charbono                 Ciliegiolo              
+##  [97] Cinsaut *                Counoise                
+##  [99] Dolcetto                 Dornfelder              
+## [101] Durif                    Freisa                  
+## [103] Gamay (Napa) *           Gamay Noir Au Jus Blanc 
+## [105] Graciano                 Grenache *              
+## [107] Grignolino               Lagrein                 
+## [109] Lambrusco                Malbec                  
+## [111] Mataro *                 Merlot                  
+## [113] Meunier *                Mission                 
+## [115] Monastrell               Montepulciano           
+## [117] Muscat Hamburg *         Nebbiolo                
+## [119] Negrette *               Negroamaro              
+## [121] Nero D&#39;Avola *           Petit Verdot            
+## [123] Petite Sirah             Pinot Noir              
+## [125] Pinotage                 Primitivo               
+## [127] Refosco *                Royalty                 
+## [129] Rubired *                Ruby Cabernet           
+## [131] Sagrantino               Salvador                
+## [133] Sangiovese *             Segalin                 
+## [135] Souzao                   St Laurent              
+## [137] Syrah *                  Tannat                  
+## [139] Tempranillo *            Teroldego               
+## [141] Tinta Cao                Tinta Madeira           
+## [143] Touriga Nacional *       Trousseau *             
+## [145] Zinfandel                Other Red  1/           
+## 159 Levels:  ...</code></pre>
+<p>We’ve still got some special characters and footnotes in there, we’ll clean them up in a second. Let’s match each variety with their type, this will help us when we want to aggregate the data later on, especially when visualizing the data.</p>
+<pre class="r"><code>dict &lt;- as.data.frame(
+  cbind(
+    as.character(sec2[c(5:7,12:45,50:94,99:162),c(1)]),
+    c(rep(&quot;table&quot;, 3), rep(&quot;raisin&quot;, 34), rep(&quot;white&quot;, 45), rep(&quot;red&quot;, 64))
+    )
+  )
+
+names(dict) &lt;- c(&quot;Variety&quot;, &quot;Type&quot;)</code></pre>
+<p>Now we can clean up the variety names. We’ll want a function that can clean a vector of varieties, so in the future we can work with data from different sources and insure consistency between them (so long as the spellings are the same…).</p>
+<pre class="r"><code>clean_grape_vector &lt;- function(input){
+    input &lt;- paste0(input)
+    input &lt;- str_to_lower(input)
+    input &lt;- str_replace_all(input, &quot;[[:punct:]]&quot;, &quot;&quot;)
+    input &lt;- str_trim(input)
+}
+
+grape.dict &lt;- clean_grape_vector(dict$Variety)</code></pre>
+<p>I also built a district key. I use this later for my apps in shiny, but it’s not really necissary. I might stop storing the district descriptions with my data though, as I think it slows down computation time in my apps. I couuld always just do a dplyr::leftjoin() it to my data later when I need it.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">District_Number</th>
+<th align="left">District_Disc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">[2] Lake</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">[3] Sonoma</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">[4] Napa</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">[5] Solano</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">[6] North Central Coast</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">[7] Monterey and San Benito</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">[8]San Luis Obispo</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">[9] Northern California</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">[10] Sierra Foothills</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="left">[11] San Joaquin and Sacramento</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">[12] San Joaquin, Stanislaus, Merced</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">[13] Fresno, Madera, N. Tulare, Mono, Inyo</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="left">[14] Kern, Kings, S. Tulare</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="left">[15] L.A. and San Bernardino</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="left">[16] So Cal</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">[17] Yolo</td>
+</tr>
+</tbody>
+</table>
+<p>I also have a district key, so that we can lift the district numbers out of the Variety column.</p>
+<pre class="r"><code>districts &lt;- paste(rep(&quot;DISTRICT&quot;, 17), rep(1:17))
+dist_key &lt;- cbind.data.frame(districts, districts, rep(1:17)) # the redundent row gets dropped in dplyr::left_join()
+
+names(dist_key) &lt;- c(&quot;key&quot;, &quot;District&quot;, &quot;District_Number&quot;)
+dist_key$key &lt;- as.character(dist_key$key)
+dist_key$District &lt;- as.character(dist_key$District)</code></pre>
+</div>
+<div id="cleaning" class="section level2">
+<h2>Cleaning</h2>
+<p>I have all of the Section 8 scripts stored as a .xls in a folder as gc<year>.xls, which is how they came in the zip file. Then I pass it through a function which:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>truncates the file name so that only the crop year is left</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>saves the year in a vector to be used later</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li>resaves the file as a .csv to be used later</li>
+</ol></li>
+</ul>
+<p>This round of code gets the job done, and I really like that I don’t manually have to save my file as a .csv by going into excel (or for me, LibreOffice Calc). Especially as I was working on cleaning the data, and this being the first larger data set that I ever had to clean, this ended up saving me time in the long run. However, I don’t think this is optimized in the long run, and if I had to run this script every day, or every hour, there might be a more efficient way of doing this (one that didn’t involve loading the file, processing it, saving it, and loading it again). At the moment I’ll only have to run this script every year to update the data with each annual release, so I’ll leave optimization to another dataset.</p>
+<pre class="r"><code>to_xls &lt;- &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/&quot;
+
+files &lt;- list.files(path = to_xls, full.names = TRUE)
+files
+
+Make_Year &lt;- function(folder){
+    files &lt;- list.files(path = folder, full.names = TRUE)
+    for(i in 1:length(files)){
+        curr_year &lt;- gsub(folder, &quot;&quot;, files[i])
+        curr_year &lt;- gsub(&quot;/gc&quot;, &quot;&quot;, curr_year)
+        curr_year &lt;- gsub(&quot;.xls&quot;, &quot;&quot;, curr_year)
+        print(curr_year)
+        data &lt;- read.xls(files[i])
+        names(data) &lt;- c(&quot;Variety&quot;, &quot;Base.Price.Per.Ton&quot;, &quot;Trash&quot;, &quot;Brix.Code&quot;, &quot;Tons&quot;)
+        data$Year &lt;- curr_year
+        write.csv(data, 
+            paste0(&quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/clean_csv/gc&quot;, curr_year, &quot;.csv&quot;),
+            row.names = FALSE)
+    }
+}
+
+Make_Year(to_xls)</code></pre>
+<p>We’ll reimport the new .csv files from the directory we saved them in, and combine them into a single dataframe</p>
+<pre class="r"><code>files &lt;- list.files(path = to_csv, full.names = TRUE)
+imported &lt;- llply(files, read.csv, stringsAsFactors = FALSE)
+uni &lt;- ldply(imported, rbind) 
+
+uni &lt;- uni %&gt;%
+    select(Variety, Base.Price.Per.Ton, Brix.Code, Tons, Year)</code></pre>
+<p>Now we create our column of only grape crush districts, this lifts the regional identifier out of the Varieties column, which is how the data came to us.</p>
+<pre class="r"><code>uni$Variety &lt;- gsub(&quot;b/&quot;, &quot;&quot;, uni$Variety)
+uni$Variety &lt;- str_trim(uni$Variety)
+uni$Variety &lt;- gsub(&quot;(?&lt;=[\\s])\\s*|^\\s+|\\s+$&quot;, &quot;&quot;, uni$Variety, perl=TRUE)
+
+g.crush &lt;- left_join(uni, dist_key, by = c(&quot;Variety&quot; = &quot;key&quot;))</code></pre>
+<p>Now that we’ve created columns with districts and years in them, we can fill out the columns so that each price and tonnage data point includes a year and grown district. We’ll also use our clean_grape_vector() function to clean up the raw variety vector.</p>
+<pre class="r"><code>g.crush$Variety &lt;- clean_grape_vector(g.crush$Variety)
+g.crush$Variety[g.crush$Variety == &quot;&quot;] &lt;- NA
+g.crush$Year[g.crush$Year == &quot;&quot;] &lt;- NA
+
+full.g.crush &lt;- g.crush %&gt;%
+    fill(District)%&gt;%
+    fill(Variety) %&gt;%
+    fill(Year) %&gt;%
+    fill(District_Number)</code></pre>
+<p>Now we’re ready to kick out all of the non-wine variety data from the Variety column. We’ll do an inner_join() with our grape variety dictionary.</p>
+<pre class="r"><code>grape.dict$Variety &lt;- as.character(grape.dict$Variety)
+clean.g.crush &lt;- inner_join(full.g.crush, grape.dict, by = &quot;Variety&quot;)</code></pre>
+<p>And to make them useful as numbers, we’ll take the comma’s out of the price and tonnage columns, and resave them as numeric vectors. Then we’ll filter out any rows without prices.</p>
+<pre class="r"><code>clean.g.crush$Base.Price.Per.Ton &lt;- gsub(&quot;,&quot;, &quot;&quot;, clean.g.crush$Base.Price.Per.Ton)
+clean.g.crush$Tons &lt;- gsub(&quot;,&quot;, &quot;&quot;, clean.g.crush$Tons)
+clean.g.crush$Base.Price.Per.Ton &lt;- as.numeric(clean.g.crush$Base.Price.Per.Ton)
+clean.g.crush$Tons &lt;- as.numeric(clean.g.crush$Tons)
+
+gc &lt;- clean.g.crush %&gt;%
+    filter(Base.Price.Per.Ton &gt; 0) %&gt;%
+    arrange(Year)</code></pre>
+<p>We’ll add our district discriptions.</p>
+<pre class="r"><code>gc &lt;- gc %&gt;%
+  left_join(district_desc)</code></pre>
+<p>And we’ve got our data!</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variety</th>
+<th align="right">Base.Price.Per.Ton</th>
+<th align="right">Brix.Code</th>
+<th align="right">Tons</th>
+<th align="right">Year</th>
+<th align="left">District</th>
+<th align="right">District_Number</th>
+<th align="left">Type</th>
+<th align="left">District_Disc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">arneis</td>
+<td align="right">1200.0</td>
+<td align="right">100</td>
+<td align="right">0.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">arneis</td>
+<td align="right">1250.0</td>
+<td align="right">100</td>
+<td align="right">1.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">473.7</td>
+<td align="right">9400</td>
+<td align="right">267.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">500.0</td>
+<td align="right">100</td>
+<td align="right">108.9</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">500.0</td>
+<td align="right">17000</td>
+<td align="right">60.4</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">500.0</td>
+<td align="right">19100</td>
+<td align="right">21.3</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">550.0</td>
+<td align="right">100</td>
+<td align="right">16.2</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">550.0</td>
+<td align="right">21200</td>
+<td align="right">46.7</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">600.0</td>
+<td align="right">100</td>
+<td align="right">145.4</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">600.0</td>
+<td align="right">9400</td>
+<td align="right">69.7</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">600.0</td>
+<td align="right">17000</td>
+<td align="right">102.4</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">620.0</td>
+<td align="right">24500</td>
+<td align="right">37.9</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">650.0</td>
+<td align="right">100</td>
+<td align="right">27.0</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">700.0</td>
+<td align="right">100</td>
+<td align="right">235.0</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">700.0</td>
+<td align="right">21000</td>
+<td align="right">20.8</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">700.0</td>
+<td align="right">26500</td>
+<td align="right">134.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">750.0</td>
+<td align="right">100</td>
+<td align="right">347.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">750.0</td>
+<td align="right">24500</td>
+<td align="right">76.3</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">800.0</td>
+<td align="right">100</td>
+<td align="right">184.9</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">800.0</td>
+<td align="right">9400</td>
+<td align="right">47.3</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+</tbody>
+</table>
+<p>Save it and enjoy =)</p>
 </div>

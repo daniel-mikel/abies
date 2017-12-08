@@ -72,7 +72,7 @@ At some point in the data cleaning process, we're going to need a way to parse t
 
 * (1) excluding all the rows we don't need or 
 
-* (2) finding a way to lift out all the rows we want. 
+* (2) finding a way to lift out the rows we want. 
 
 Since we're going to be processing multiple Section 8's over a long period of time from the dataset, and since we can't assume that this data has all been processed excactly the same way (the files could and probably were loaded in the year the report was published, giving 13 years for potential changes in processes). Some of the rows even include footnotes, and since going through 150,000 rows of data looking for each unique string of characters I don't want seems a little inefficient, I think (2) will be the safer assumption. 
 
@@ -80,8 +80,163 @@ Section 8 is what we want, but we'll start with another section to pull out a li
 
 ```{r, echo = FALSE, results = 'asis', fig.width = 9}
 sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
-sec2 <- sec2[c(2, 4:19),c(1:11, 13:19)]
-
-knitr::kable(sec2)
+knitr::kable(sec2[c(2, 4:19),c(1:11, 13:19)])
 ```
 
+We only want data from the first column, since that's where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.
+
+```{r}
+print(sec2[c(5:7,12:45,50:94,99:162),c(1)])
+```
+
+We've still got some special characters and footnotes in there, we'll clean them up in a second. Let's match each variety with their type, this will help us when we want to aggregate the data later on, especially when visualizing the data.
+
+```{r}
+dict <- as.data.frame(
+  cbind(
+    as.character(sec2[c(5:7,12:45,50:94,99:162),c(1)]),
+    c(rep("table", 3), rep("raisin", 34), rep("white", 45), rep("red", 64))
+    )
+  )
+
+names(dict) <- c("Variety", "Type")
+```
+
+Now we can clean up the variety names. We'll want a function that can clean a vector of varieties, so in the future we can work with data from different sources and insure consistency between them (so long as the spellings are the same...). 
+
+```{r}
+clean_grape_vector <- function(input){
+	input <- paste0(input)
+	input <- str_to_lower(input)
+	input <- str_replace_all(input, "[[:punct:]]", "")
+	input <- str_trim(input)
+}
+
+grape.dict <- clean_grape_vector(dict$Variety)
+```
+
+I also built a district key. I use this later for my apps in shiny, but it's not really necissary. I might stop storing the district descriptions with my data though, as I think it slows down computation time in my apps. I couuld always just do a dplyr::leftjoin() it to my data later when I need it. 
+
+```{r, echo = FALSE, results = 'asis', fig.width = 9}
+
+district_desc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/district_key.csv")
+
+knitr::kable(district_desc)
+```
+
+I also have a district key, so that we can lift the district numbers out of the Variety column.
+
+```{r, eval = FALSE}
+districts <- paste(rep("DISTRICT", 17), rep(1:17))
+dist_key <- cbind.data.frame(districts, districts, rep(1:17)) # the redundent row gets dropped in dplyr::left_join()
+
+names(dist_key) <- c("key", "District", "District_Number")
+dist_key$key <- as.character(dist_key$key)
+dist_key$District <- as.character(dist_key$District)
+```
+
+## Cleaning
+
+I have all of the Section 8 scripts stored as a .xls in a folder as gc<year>.xls, which is how they came in the zip file. Then I pass it through a function which:
+
+* (1) truncates the file name so that only the crop year is left
+* (2) saves the year in a vector to be used later
+* (3) resaves the file as a .csv to be used later
+
+This round of code gets the job done, and I really like that I don't manually have to save my file as a .csv by going into excel (or for me, LibreOffice Calc). Especially as I was working on cleaning the data, and this being the first larger data set that I ever had to clean, this ended up saving me time in the long run. However, I don't think this is optimized in the long run, and if I had to run this script every day, or every hour, there might be a more efficient way of doing this (one that didn't involve loading the file, processing it, saving it, and loading it again). At the moment I'll only have to run this script every year to update the data with each annual release, so I'll leave optimization to another dataset.
+
+```{r, eval = FALSE}
+to_xls <- "/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/"
+
+files <- list.files(path = to_xls, full.names = TRUE)
+files
+
+Make_Year <- function(folder){
+	files <- list.files(path = folder, full.names = TRUE)
+	for(i in 1:length(files)){
+		curr_year <- gsub(folder, "", files[i])
+		curr_year <- gsub("/gc", "", curr_year)
+		curr_year <- gsub(".xls", "", curr_year)
+		print(curr_year)
+		data <- read.xls(files[i])
+		names(data) <- c("Variety", "Base.Price.Per.Ton", "Trash", "Brix.Code", "Tons")
+		data$Year <- curr_year
+		write.csv(data, 
+			paste0("/home/dan/Data/NASS/Grape_Crush/all_section_8/clean_csv/gc", curr_year, ".csv"),
+			row.names = FALSE)
+	}
+}
+
+Make_Year(to_xls)
+```
+
+We'll reimport the new .csv files from the directory we saved them in, and combine them into a single dataframe
+
+```{r, eval = FALSE}
+files <- list.files(path = to_csv, full.names = TRUE)
+imported <- llply(files, read.csv, stringsAsFactors = FALSE)
+uni <- ldply(imported, rbind) 
+
+uni <- uni %>%
+	select(Variety, Base.Price.Per.Ton, Brix.Code, Tons, Year)
+```
+
+Now we create our column of only grape crush districts, this lifts the regional identifier out of the Varieties column, which is how the data came to us.
+
+```{r, eval = FALSE}
+uni$Variety <- gsub("b/", "", uni$Variety)
+uni$Variety <- str_trim(uni$Variety)
+uni$Variety <- gsub("(?<=[\\s])\\s*|^\\s+|\\s+$", "", uni$Variety, perl=TRUE)
+
+g.crush <- left_join(uni, dist_key, by = c("Variety" = "key"))
+```
+
+Now that we've created columns with districts and years in them, we can fill out the columns so that each price and tonnage data point includes a year and grown district. We'll also use our clean_grape_vector() function to clean up the raw variety vector.
+
+```{r, eval = FALSE}
+g.crush$Variety <- clean_grape_vector(g.crush$Variety)
+g.crush$Variety[g.crush$Variety == ""] <- NA
+g.crush$Year[g.crush$Year == ""] <- NA
+
+full.g.crush <- g.crush %>%
+	fill(District)%>%
+	fill(Variety) %>%
+	fill(Year) %>%
+	fill(District_Number)
+```
+
+Now we're ready to kick out all of the non-wine variety data from the Variety column. We'll do an inner_join() with our grape variety dictionary.
+
+```{r, eval = FALSE}
+grape.dict$Variety <- as.character(grape.dict$Variety)
+clean.g.crush <- inner_join(full.g.crush, grape.dict, by = "Variety")
+```
+
+And to make them useful as numbers, we'll take the comma's out of the price and tonnage columns, and resave them as numeric vectors. Then we'll filter out any rows without prices.
+
+```{r, eval = FALSE}
+clean.g.crush$Base.Price.Per.Ton <- gsub(",", "", clean.g.crush$Base.Price.Per.Ton)
+clean.g.crush$Tons <- gsub(",", "", clean.g.crush$Tons)
+clean.g.crush$Base.Price.Per.Ton <- as.numeric(clean.g.crush$Base.Price.Per.Ton)
+clean.g.crush$Tons <- as.numeric(clean.g.crush$Tons)
+
+gc <- clean.g.crush %>%
+	filter(Base.Price.Per.Ton > 0) %>%
+	arrange(Year)
+```
+
+We'll add our district discriptions.
+
+```{r, eval = FALSE}
+gc <- gc %>%
+  left_join(district_desc)
+```
+
+And we've got our data!
+
+```{r, echo = FALSE, results = 'asis', fig.width = 9}
+gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
+knitr::kable(head(gc, n = 20))
+```
+
+Save it and enjoy =)
