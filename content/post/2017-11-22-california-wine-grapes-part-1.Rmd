@@ -16,8 +16,6 @@ library(knitr)
 
 gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
 gc$District_Number <- as.factor(gc$District_Number)
-
-
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
@@ -65,7 +63,7 @@ And can see which districts grow which varieties
 
 ```{r, echo = FALSE}
 
-knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", height = "675px")
+knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/")
 
 ```
 
@@ -89,10 +87,10 @@ gc %>%
                                  "#e5c494")) +
   ggtitle("Histograms of Grape Prices by District") +
   theme_joy() +
-  theme(axis.text=element_text(size=10)) +
+  theme(axis.text = element_text(size = 10),
+        axis.text.y = element_text(size = 8, angle = 0)) +
   xlab("Price, Dollars per Ton") +
   ylab(NULL) 
-
 ```
 
 Price between varieties seems pretty coorolated within districts between varieties, with red wine consistently outpricing white wine in each district
@@ -179,8 +177,5 @@ gc %>%
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found [daniel-mikel.shinyapps.io](https://daniel-mikel.shinyapps.io/historic_california_grape_crush/)
 
 ```{r, echo = FALSE}
-
-knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
-                   height = "675px")
-
+knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/")
 ```
