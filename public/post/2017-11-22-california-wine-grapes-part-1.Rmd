@@ -16,6 +16,8 @@ library(knitr)
 
 gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
 gc$District_Number <- as.factor(gc$District_Number)
+
+
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
@@ -63,7 +65,7 @@ And can see which districts grow which varieties
 
 ```{r, echo = FALSE}
 
-knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/")
+knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", height = "675px")
 
 ```
 
@@ -177,5 +179,8 @@ gc %>%
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found [daniel-mikel.shinyapps.io](https://daniel-mikel.shinyapps.io/historic_california_grape_crush/)
 
 ```{r, echo = FALSE}
-knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/")
+
+knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
+                   height = "675px")
+
 ```
