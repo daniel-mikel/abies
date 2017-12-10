@@ -18,7 +18,7 @@ canonifyurls = true
 
 [author]
   name = "Daniel Mikel"
-  bio = "This is a blog I started for myself to practice and share my R progress. Feel free to give me feedback at dmikel2010@gmail.com. This website is powered by blogdown and run through Rstudio"
+  bio = "This is a blog I started for myself to practice and share my R progress. This website is powered by blogdown and run through Rstudio"
  # job = "Your job title"
   location = "Sacramento, CA"
   # Your Gravatar email. Overwrite `author.picture` everywhere in the blog
