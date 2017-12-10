@@ -4,6 +4,7 @@ author: "Daniel Mikel"
 date: "2017-11-28T21:13:14-05:00"
 output: html_document
 runtime: shiny
+coverImage: ""
 ---
 
 The [United States Department of Agriculture](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it's price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.

@@ -3,7 +3,7 @@ title: "Cleaning Data"
 author: "Daniel Mikel"
 date: "2017-11-27T21:13:14-05:00"
 output: html_document
-coverImage: "/images/gc_districts.png"
+coverImage: ""
 ---
 
 ```{r, echo = FALSE, message = FALSE}
