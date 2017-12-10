@@ -84,9 +84,9 @@ Since we're going to be processing multiple Section 8's over a long period of ti
 
 Section 8 is what we want, but we'll start with another section to pull out a list of wine varieties included in the dataset. Section 2 is less than 200 rows long, and each unique variety has it's own row. 
 
-```{r, echo = FALSE, results = 'asis', fig.width = 9}
+```{r, echo = FALSE, results = 'asis', fig.width = 6}
 sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
-knitr::kable(sec2[c(2, 4:19),c(1:11, 13:19)])
+knitr::kable(sec2[c(2, 4:19),c(1:8)])
 ```
 
 We only want data from the first column, since that's where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.
@@ -123,7 +123,7 @@ grape.dict <- clean_grape_vector(dict$Variety)
 
 I also built a district key. I use this later for my apps in shiny, but it's not really necissary. I might stop storing the district descriptions with my data though, as I think it slows down computation time in my apps. I couuld always just do a dplyr::leftjoin() it to my data later when I need it. 
 
-```{r, echo = FALSE, results = 'asis', fig.width = 9}
+```{r, echo = FALSE, results = 'asis'}
 
 district_desc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/district_key.csv")
 
@@ -242,7 +242,7 @@ And we've got our data!
 
 ```{r, echo = FALSE, results = 'asis'}
 gc <- read.csv("/home/dan/Data/NASS/Grape_Crush/gc_csv/all_gc_clean.csv")
-knitr::kable(head(gc, n = 5))
+knitr::kable(head(gc[c(1:5,7:9)], n = 5))
 ```
 
 Save it and enjoy =)
