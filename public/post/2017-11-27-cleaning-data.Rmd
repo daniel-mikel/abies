@@ -7,9 +7,8 @@ output:
     df_print: paged
     toc: true
     toc_depth: 2
-coverImage: "/FALSE/images/gc_districts.png"
-thumbnail_image: "/images/gc_districts.png"
-thumbnail_image_position: "left"
+    theme: united
+    highlight: tango
 ---
 
 ```{r, echo = FALSE, message = FALSE}
