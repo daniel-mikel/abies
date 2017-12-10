@@ -86,7 +86,7 @@ Section 8 is what we want, but we'll start with another section to pull out a li
 
 ```{r, echo = FALSE, results = 'asis', fig.width = 6}
 sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
-knitr::kable(sec2[c(2, 4:19),c(1:8)])
+knitr::kable(sec2[c(1, 4:19),c(1:8)])
 ```
 
 We only want data from the first column, since that's where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.
