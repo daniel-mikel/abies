@@ -20,13 +20,13 @@ gc$District_Number <- as.factor(gc$District_Number)
 
 ```
 
-```{r, echo = FALSE, results = 'asis', fig.width = 9}
+```{r, echo = FALSE, results = 'asis'}
 knitr::kable(gc[1:5, 1:6])
 ```
 
 We can see the distribution of tonnage within California's wine regions.
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 cols <- c("red" = "#F8766D", "white" = "#00BFC4", "raisin" = "#C77CFF", "table" = "#7CAE00", "all wine" = "#190B28")
 
 gc %>%
@@ -63,7 +63,7 @@ gc %>%
 
 And can see which districts grow which varieties
 
-```{r, echo = FALSE, fig.width = 9}
+```{r, echo = FALSE}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", height = "675px")
 
@@ -71,7 +71,7 @@ knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_co
 
 We can also see a distribution of prices by district. We can see a sharp difference between the higher production regions like Fresno, Madera, and North Tulare counties and the districts average weighted price. 
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 gc %>%
   filter(Base.Price.Per.Ton <= 10000) %>%
   arrange(desc(District_Number)) %>%
@@ -97,7 +97,7 @@ gc %>%
 
 Price between varieties seems pretty coorolated within districts between varieties, with red wine consistently outpricing white wine in each district
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 gc %>%
   group_by(District_Disc, District_Number, Year, Type) %>%
   filter(Type %in% c("red", "white")) %>%
@@ -113,7 +113,7 @@ gc %>%
 
 We can also see that over time, as prices fluctuate over the years, the relationship between white and red wine prices stays consistent. Here we track the price in Sonoma County from 2005 to the present. We can see that while prices have changed considerably year over year, red wine has stayed abour 1.4x the price of white wine within the district
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 gc %>%
   group_by(District_Disc, District_Number, Year, Type) %>%
   filter(Type %in% c("red", "white")) %>%
@@ -130,7 +130,7 @@ gc %>%
 
 This  can be seen across many California Wine Districts.
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 gc %>%
   group_by(District_Disc, District_Number, Year, Type) %>%
   filter(Type %in% c("red", "white")) %>%
@@ -145,7 +145,7 @@ gc %>%
   theme_minimal()     
 ```
 
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 gc %>%
   group_by(District_Disc, District_Number, Year, Type) %>%
   filter(Type %in% c("red", "white")) %>%
@@ -161,7 +161,7 @@ gc %>%
 ```
 
 But is not necessarily present in every district
-```{r, echo = FALSE, message = FALSE, fig.height = 6, fig.width = 9}
+```{r, echo = FALSE, message = FALSE, fig.height = 6}
 gc %>%
   group_by(District_Disc, District_Number, Year, Type) %>%
   filter(Type %in% c("red", "white")) %>%
@@ -178,7 +178,7 @@ gc %>%
 
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found [daniel-mikel.shinyapps.io](https://daniel-mikel.shinyapps.io/historic_california_grape_crush/)
 
-```{r, echo = FALSE, fig.width = 9}
+```{r, echo = FALSE}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
                    height = "675px")
