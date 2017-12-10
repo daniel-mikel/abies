@@ -25,7 +25,7 @@ canonifyurls = true
   # gravatarEmail = "dmikel2010@gmail.com"
   # Your profile picture
   # Overwritten by your gravatar image if `author.gravatarEmail` is filled
-  picture = "/home/dan/R/blog/abies/themes/hugo-tranquilpeak-theme/static/images/profile.jpg"
+  picture = "https://cdn1.iconfinder.com/data/icons/ninja-things-1/1772/ninja-simple-512.png"
   # Your Twitter username without the @. E.g : thibaudlepretre
   twitter = "dmikel2010"
   # Your google plus profile id. E.g : +ThibaudLepretre or 114625208755123718311
