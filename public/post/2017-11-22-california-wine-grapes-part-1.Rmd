@@ -68,7 +68,7 @@ gc %>%
 
 And can see which districts grow which varieties
 
-```{r, echo = FALSE, fig.width = 9}
+```{r, echo = FALSE, fig.width = 8}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_shiny_find_varieties_col/", 
                    height = "650px")
@@ -113,7 +113,7 @@ gc %>%
   geom_point() + 
   geom_text(aes(label = District_Number), hjust = 1, vjust = 1.5) +
   geom_smooth(aes(group = 1), method = lm, se = FALSE, linetype = 2) +
-  ggtitle("Red and White Grower Return Prices, Weighted Dollars per Ton") +
+  ggtitle("Red and White Grower Return Prices, Dollars per Ton") +
   theme_minimal()
 ```
 
@@ -130,7 +130,7 @@ gc %>%
   geom_point() + 
   geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
   geom_smooth(aes(group = 1), method = lm, se = FALSE, linetype = 2) +
-  ggtitle("Historic Red and White Grower Return Prices for Napa County, Weighted Dollars per Ton") +
+  ggtitle("Red and White Grower Return Prices for Sonoma, Dollars per Ton") +
   theme_minimal()     
 ```
 
@@ -147,7 +147,7 @@ gc %>%
   geom_point() + 
   # geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
   geom_smooth(method = lm, se = FALSE, linetype = 2) +
-  ggtitle("Historic Red and White Grower Return Prices By District, Dollars per Ton") +
+  ggtitle("Red and White Grower Return Prices By District, Dollars per Ton") +
   theme_minimal()     
 ```
 
@@ -162,7 +162,7 @@ gc %>%
   geom_point() + 
   # geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
   geom_smooth(method = lm, se = FALSE, linetype = 2) +
-  ggtitle("Historic Red and White Grower Return Prices By District, Dollars per Ton") +
+  ggtitle("Red and White Grower Return Prices By District, Dollars per Ton") +
   theme_minimal()  
 ```
 
@@ -178,13 +178,13 @@ gc %>%
   geom_point() + 
   # geom_text(aes(label = Year), hjust = 1, vjust = 1.5) +
   geom_smooth(method = lm, se = FALSE, linetype = 2) +
-  ggtitle("Historic Red and White Grower Return Prices By District, Dollars per Ton") +
+  ggtitle("Red and White Grower Return Prices By District, Dollars per Ton") +
   theme_minimal()     
 ```
 
 We can compare historic varieties prices within regions. The interactive graph below allows you to select varieties or types within a region and compare it to other varieties and types within the same region. A full version can be found [daniel-mikel.shinyapps.io](https://daniel-mikel.shinyapps.io/historic_california_grape_crush/)
 
-```{r, echo = FALSE, fig.width = 9}
+```{r, echo = FALSE, fig.width = 8}
 
 knitr::include_app("https://daniel-mikel.shinyapps.io/gc_variety_embed/", 
                    height = "650px")
