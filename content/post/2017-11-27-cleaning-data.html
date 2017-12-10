@@ -6,7 +6,7 @@ output:
   html_document:
     toc: true
     toc_depth: 2
-coverImage: "/FAIL/images/gc_districts.png"
+coverImage: "/FALSE/images/gc_districts.png"
 thumbnail_image: "/images/gc_districts.png"
 thumbnail_image_position: "left"
 ---
@@ -30,10 +30,22 @@ library(&quot;plyr&quot;)
 library(&quot;stringr&quot;)
 library(&quot;gdata&quot;)</code></pre>
 <p>I’ve loaded library(“gdata”) for the read.xls() function, library(“tidyverse”) mostly out of habit but also for dplyr joins, library(“stringr”) will be used later for manipulating character vectors, and libary(“plyr”) for some apply() functions that don’t come with base R. I’ve saved all of the .xls files from <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">The USDA</a> and put all of the section 8 files in their own folder. There are over 17,000 rows of data, so we’ll just look at the first 15</p>
-<p>District, Type, and Variety Base Price Per Ton NA Brix Factors Tons 2 Dollars NA Code a/<br />
-3 DISTRICT 1 NA<br />
-4 WINE GRAPES (WHITE) NA<br />
-5 Albarino 2,800.00 NA 000100 1.3 6 3,200.00 NA 000100 1.3 7 Wtd. Avg. Base &amp; Total Tons 3,000.00 NA 2.6 8 Arneis 1,500.00 NA 000100 2.8 9 1,700.00 NA 000100 6.2 10 1,850.00 NA 018800 3.9 11 Wtd. Avg. Base &amp; Total Tons 1,701.94 NA 12.9 12 Chardonnay * 275.00 NA 009400 90.8 13 500.00 NA 050773 6.9 14 900.00 NA 000100 119.8 15 913.00 NA 000100 84.9 16 950.00 NA 000100 49.0</p>
+<pre><code>##    District, Type, and Variety Base Price Per Ton NA Brix Factors  Tons
+## 2                                         Dollars NA      Code a/      
+## 3                  DISTRICT 1                     NA                   
+## 4         WINE GRAPES (WHITE)                     NA                   
+## 5                    Albarino            2,800.00 NA       000100   1.3
+## 6                                        3,200.00 NA       000100   1.3
+## 7  Wtd. Avg. Base &amp; Total Tons           3,000.00 NA                2.6
+## 8                      Arneis            1,500.00 NA       000100   2.8
+## 9                                        1,700.00 NA       000100   6.2
+## 10                                       1,850.00 NA       018800   3.9
+## 11 Wtd. Avg. Base &amp; Total Tons           1,701.94 NA               12.9
+## 12               Chardonnay *              275.00 NA       009400  90.8
+## 13                                         500.00 NA       050773   6.9
+## 14                                         900.00 NA       000100 119.8
+## 15                                         913.00 NA       000100  84.9
+## 16                                         950.00 NA       000100  49.0</code></pre>
 <p>A few things now come to mind:</p>
 <ul>
 <li><p><strong>Tidiness</strong> Each row corresponds to single grape contract in a given district with the grapes variety and the contracts volume (in tons). For a human this data is pretty easy to interpret but for a vectorized program this data will take considerable work in order to manipulate efficiently.</p></li>
@@ -459,6 +471,60 @@ Make_Year(to_xls)</code></pre>
 </tr>
 </tbody>
 </table>
+<pre><code>##    TABLE.2...TONS.OF.GRAPES.CRUSHED.BY.CALIFORNIA.PROCESSORS   X X.1 X.2
+## 2                                           Type and Variety   1   2   3
+## 4                                             RAISIN GRAPES:            
+## 5                                                    Fiesta  0.0 0.0 0.0
+## 6                                         Thompson Seedless  0.0 0.0 0.0
+## 7                                          Other Raisin  1/  0.0 0.0 0.0
+## 8                                                                       
+## 9                                              Total Raisin  0.0 0.0 0.0
+## 10                                                                      
+## 11                                             TABLE GRAPES:            
+## 12                                                  Allison  0.0 0.0 0.0
+## 13                                              Autumn King  0.0 0.0 0.0
+## 14                                             Autumn Royal  0.0 0.0 0.0
+## 15                                        Beauty Seedless *  0.0 0.0 0.0
+## 16                                            Black Monukka  0.0 0.0 0.0
+## 17                                           Blanc Seedless  0.0 0.0 0.0
+## 18                                                 Calmeria  0.0 0.0 0.0
+## 19                                           Christmas Rose  0.0 0.0 0.0
+##    X.3 X.4 X.5 X.6 X.7 X.8     X.9 X.10 X.11     X.12     X.13 X.14 X.15
+## 2    4   5   6   7   8   9      10   11   12       13       14   15   16
+## 4                                                                NA     
+## 5  0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0 11,448.0  1,349.9    0  0.0
+## 6  0.0 0.0 0.0 0.0 2.0 0.0 1,794.7  0.5 99.9 53,983.2 21,451.2    0  0.0
+## 7  0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0      5.1      0.0    0  0.0
+## 8                                                                NA     
+## 9  0.0 0.0 0.0 0.0 2.0 0.0 1,794.7  0.5 99.9 65,436.3 22,801.1    0  0.0
+## 10                                                               NA     
+## 11                                                               NA     
+## 12 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0     62.3      0.0    0  0.0
+## 13 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0     61.4  7,706.3    0  0.0
+## 14 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0     69.6  3,709.1    0  0.0
+## 15 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0      0.0      0.0    0  0.0
+## 16 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0      0.0      0.0    0  0.0
+## 17 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0      0.0      0.0    0  0.0
+## 18 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0      0.0     59.9    0  0.0
+## 19 0.0 0.0 0.0 0.0 0.0 0.0     0.0  0.0  0.0      0.0     53.6    0  0.0
+##    X.16
+## 2    17
+## 4      
+## 5   0.0
+## 6   0.0
+## 7   0.0
+## 8      
+## 9   0.0
+## 10     
+## 11     
+## 12  0.0
+## 13  0.0
+## 14  0.0
+## 15  0.0
+## 16  0.0
+## 17  0.0
+## 18  0.0
+## 19  0.0</code></pre>
 <p>We only want data from the first column, since that’s where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.</p>
 <pre class="r"><code>print(sec2[c(5:7,12:45,50:94,99:162),c(1)])</code></pre>
 <pre><code>##   [1] Fiesta                   Thompson Seedless       

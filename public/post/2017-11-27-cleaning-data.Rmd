@@ -6,7 +6,7 @@ output:
   html_document:
     toc: true
     toc_depth: 2
-coverImage: "/FAIL/images/gc_districts.png"
+coverImage: "/FALSE/images/gc_districts.png"
 thumbnail_image: "/images/gc_districts.png"
 thumbnail_image_position: "left"
 ---
@@ -37,7 +37,7 @@ library("gdata")
 
 I've loaded library("gdata") for the read.xls() function, library("tidyverse") mostly out of habit but also for dplyr joins, library("stringr") will be used later for manipulating character vectors, and libary("plyr") for some apply() functions that don't come with base R. I've saved all of the .xls files from [The USDA](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) and put all of the section 8 files in their own folder. There are over 17,000 rows of data, so we'll just look at the first 15
 
-```{r, echo = FALSE, results = 'asis', fig.width = 9}
+```{r, echo = FALSE, fig.width = 9}
 gc2016 <- read.xls("/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/gc2016.xls")
 names(gc2016) <- c("District, Type, and Variety", "Base Price Per Ton", "NA", "Brix Factors", "Tons")
 
@@ -92,6 +92,11 @@ Section 8 is what we want, but we'll start with another section to pull out a li
 ```{r, echo = FALSE, results = 'asis', fig.width = 9}
 sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
 knitr::kable(sec2[c(2, 4:19),c(1:11, 13:19)])
+```
+
+```{r, echo = FALSE, fig.width = 9}
+sec2 <- read.csv("/home/dan/Data/NASS/Grape_Crush/all_section_2/2016 gcbtb02.csv")
+sec2[c(2, 4:19),c(1:11, 13:19)]
 ```
 
 We only want data from the first column, since that's where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.
