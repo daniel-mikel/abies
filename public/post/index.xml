@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Abies</title>
+    <title>Posts on Hugo tranquilpeak theme</title>
     <link>/post/</link>
-    <description>Recent content in Posts on Abies</description>
+    <description>Recent content in Posts on Hugo tranquilpeak theme</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 28 Nov 2017 21:13:14 -0500</lastBuildDate>
@@ -13,19 +13,19 @@
     
     <item>
       <title>California Wine  - Part 1</title>
-      <link>/2017/11/28/california-wine----part-1/</link>
+      <link>/2017/11/california-wine----part-1/</link>
       <pubDate>Tue, 28 Nov 2017 21:13:14 -0500</pubDate>
       
-      <guid>/2017/11/28/california-wine----part-1/</guid>
+      <guid>/2017/11/california-wine----part-1/</guid>
       <description>The United States Department of Agriculture publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it’s price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.</description>
     </item>
     
     <item>
       <title>Cleaning Data</title>
-      <link>/2017/11/27/cleaning-data/</link>
+      <link>/2017/11/cleaning-data/</link>
       <pubDate>Mon, 27 Nov 2017 21:13:14 -0500</pubDate>
       
-      <guid>/2017/11/27/cleaning-data/</guid>
+      <guid>/2017/11/cleaning-data/</guid>
       <description>California Wine The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the United States Department of Agriculture’s Grape Crush Report which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.
 California Grape Price Districts Image</description>
     </item>

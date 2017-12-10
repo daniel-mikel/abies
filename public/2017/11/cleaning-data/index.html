@@ -1,0 +1,1480 @@
+
+
+  
+    
+  
+
+
+  
+
+
+
+
+  
+
+
+  
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Hugo 0.31 with theme Tranquilpeak 0.4.3-BETA">
+    <title>Cleaning Data</title>
+    <meta name="author" content="Daniel Mikel">
+    <meta name="keywords" content="">
+
+    <link rel="icon" href="/favicon.png">
+    
+
+    
+    <meta name="description" content="California Wine The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the United States Department of Agriculture’s Grape Crush Report which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.
+California Grape Price Districts Image">
+    <meta property="og:description" content="California Wine The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the United States Department of Agriculture’s Grape Crush Report which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.
+California Grape Price Districts Image">
+    <meta property="og:type" content="blog">
+    <meta property="og:title" content="Cleaning Data">
+    <meta property="og:url" content="/2017/11/cleaning-data/">
+    <meta property="og:site_name" content="Hugo tranquilpeak theme">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Hugo tranquilpeak theme">
+    <meta name="twitter:description" content="California Wine The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the United States Department of Agriculture’s Grape Crush Report which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.
+California Grape Price Districts Image">
+    
+      <meta name="twitter:creator" content="@dmikel2010">
+    
+    
+
+    
+    
+
+    
+      <meta property="og:image" content="//www.gravatar.com/avatar/592086535255154a127066fa0929a42c?s=640">
+    
+
+    
+    
+    
+
+    
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.min.css" integrity="sha256-vuXZ9LGmmwtjqFX1F+EKin1ThZMub58gKULUyf0qECk=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/helpers/jquery.fancybox-thumbs.min.css" integrity="sha256-SEa4XYAHihTcEP1f5gARTB2K26Uk8PsndQYHQC1f4jU=" crossorigin="anonymous" />
+    
+    
+    <link rel="stylesheet" href="/css/style-jsjn0006wyhpyzivf6yceb31gvpjatbcs3qzjvlumobfnugccvobqwxnnaj8.min.css" />
+    
+    
+
+    
+      
+    
+    
+  </head>
+
+  <body>
+    <div id="blog">
+      <header id="header" data-behavior="4">
+  <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+  <div class="header-title">
+    <a class="header-title-link" href="/">Hugo tranquilpeak theme</a>
+  </div>
+  
+    
+      <a class="header-right-picture "
+         href="/#about">
+    
+    
+    
+      
+        <img class="header-picture" src="//www.gravatar.com/avatar/592086535255154a127066fa0929a42c?s=90" alt="Author&#39;s picture" />
+      
+    
+    </a>
+  
+</header>
+
+      <nav id="sidebar" data-behavior="4">
+  <div class="sidebar-container">
+    
+      <div class="sidebar-profile">
+        <a href="/#about">
+          <img class="sidebar-profile-picture" src="//www.gravatar.com/avatar/592086535255154a127066fa0929a42c?s=110" alt="Author&#39;s picture" />
+        </a>
+        <h4 class="sidebar-profile-name">Daniel Mikel</h4>
+        
+          <h5 class="sidebar-profile-bio">Super bio with markdown support <strong>COOL</strong></h5>
+        
+      </div>
+    
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-home"></i>
+      
+      <span class="sidebar-button-desc">Home</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/categories">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-bookmark"></i>
+      
+      <span class="sidebar-button-desc">Categories</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/tags">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-tags"></i>
+      
+      <span class="sidebar-button-desc">Tags</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/archives">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-archive"></i>
+      
+      <span class="sidebar-button-desc">Archives</span>
+    </a>
+  </li>
+
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/#about">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-question"></i>
+      
+      <span class="sidebar-button-desc">About</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="https://github.com/daniel-mikel">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-github"></i>
+      
+      <span class="sidebar-button-desc">GitHub</span>
+    </a>
+  </li>
+
+
+    </ul>
+    <ul class="sidebar-buttons">
+      
+  <li class="sidebar-button">
+    
+      <a class="sidebar-button-link " href="/index.xml">
+    
+      <i class="sidebar-button-icon fa fa-lg fa-rss"></i>
+      
+      <span class="sidebar-button-desc">RSS</span>
+    </a>
+  </li>
+
+
+    </ul>
+  </div>
+</nav>
+
+      
+
+      <div id="main" data-behavior="4"
+        class="
+               hasCoverMetaIn
+               ">
+        <article class="post" itemscope itemType="http://schema.org/BlogPosting">
+          
+          
+            <div class="post-header main-content-wrap text-left">
+  
+    <h1 class="post-title" itemprop="headline">
+      Cleaning Data
+    </h1>
+  
+  
+  <div class="postShorten-meta post-meta">
+    
+      <time itemprop="datePublished" datetime="2017-11-27T21:13:14-05:00">
+        
+  November 27, 2017
+
+      </time>
+    
+    
+  </div>
+
+</div>
+          
+          <div class="post-content markdown" itemprop="articleBody">
+            <div class="main-content-wrap">
+              <div id="california-wine" class="section level2">
+<h2>California Wine</h2>
+<p>The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">United States Department of Agriculture’s Grape Crush Report</a> which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.</p>
+<div class="figure">
+<img src="/home/dan/Data/NASS/Grape_Crush/pictures/Screenshot%20from%202017-11-28%2020-33-12.png" alt="California Grape Price Districts Image" />
+<p class="caption">California Grape Price Districts Image</p>
+</div>
+<p>This California Wine has some interesting potential for future projects. On a personal level it will be good to practice to work with a real data set, and it’s not like wine is completely unrelatable (even if I’m more of a beer person). It also presents fodder for furthering the project, ideas like scraping winery and wine sales to analyze mark up prices, or modeling price and production based on rainfall and temperture are some feasible next steps I could take this data. Even working just with the price and production data from the Grape Crush Report will give me practice cleaning data, working with tidyr and dplyr to manipulate a large dataset, and using ggplot2 and shiny to visualize data.</p>
+</div>
+<div id="first-look-at-the-data" class="section level2">
+<h2>First look at the data</h2>
+<p>Cleaning data feels like doing someone else’s homework. Here are the packages I’ll be working with:</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+library(&quot;plyr&quot;)
+library(&quot;stringr&quot;)
+library(&quot;gdata&quot;)</code></pre>
+<p>I’ve loaded library(“gdata”) for the read.xls() function, library(“tidyverse”) mostly out of habit but also for dplyr joins, library(“stringr”) will be used later for manipulating character vectors, and libary(“plyr”) for some apply() functions that don’t come with base R. I’ve saved all of the .xls files from <a href="https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/">The USDA</a> and put all of the section 8 files in their own folder. There are over 17,000 rows of data, so we’ll just look at the first 15</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">District, Type, and Variety</th>
+<th align="left">Base Price Per Ton</th>
+<th align="left">NA</th>
+<th align="left">Brix Factors</th>
+<th align="left">Tons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td align="left"></td>
+<td align="left">Dollars</td>
+<td align="left">NA</td>
+<td align="left">Code a/</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td align="left">DISTRICT 1</td>
+<td align="left"></td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td align="left">WINE GRAPES (WHITE)</td>
+<td align="left"></td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td align="left">Albarino</td>
+<td align="left">2,800.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">1.3</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td align="left"></td>
+<td align="left">3,200.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">1.3</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td align="left">Wtd. Avg. Base &amp; Total Tons</td>
+<td align="left">3,000.00</td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left">2.6</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td align="left">Arneis</td>
+<td align="left">1,500.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">2.8</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td align="left"></td>
+<td align="left">1,700.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">6.2</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td align="left"></td>
+<td align="left">1,850.00</td>
+<td align="left">NA</td>
+<td align="left">018800</td>
+<td align="left">3.9</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td align="left">Wtd. Avg. Base &amp; Total Tons</td>
+<td align="left">1,701.94</td>
+<td align="left">NA</td>
+<td align="left"></td>
+<td align="left">12.9</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td align="left">Chardonnay *</td>
+<td align="left">275.00</td>
+<td align="left">NA</td>
+<td align="left">009400</td>
+<td align="left">90.8</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td align="left"></td>
+<td align="left">500.00</td>
+<td align="left">NA</td>
+<td align="left">050773</td>
+<td align="left">6.9</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td align="left"></td>
+<td align="left">900.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">119.8</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td align="left"></td>
+<td align="left">913.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">84.9</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td align="left"></td>
+<td align="left">950.00</td>
+<td align="left">NA</td>
+<td align="left">000100</td>
+<td align="left">49.0</td>
+</tr>
+</tbody>
+</table>
+<p>A few things now come to mind:</p>
+<ul>
+<li><p><strong>Tidiness</strong> Each row corresponds to single grape contract in a given district with the grapes variety and the contracts volume (in tons). For a human this data is pretty easy to interpret but for a vectorized program this data will take considerable work in order to manipulate efficiently.</p></li>
+<li><p><strong>Years</strong> Within each years data there is no indication of the time the data is from. Since the data was meant to be included within a booklet of data from the same year. We’ll need to add the years to the datasets before we combine them with eachother.</p></li>
+<li><p><strong>The Variety Column</strong> The first column has a lot of information in it, too much even! The wine district, the wine type, and the wine variety, and various sums are all within this column. We’ll need to split the data include in this column out, as much of the information refers to later observations, and uses titles and whitespace within the column to give information about the data itself. We’ll need to draw out the extra data into it’s own columns in order to process this with R.</p></li>
+</ul>
+<p>Let’s start by solving the second problem, adding a year column based on the file name (which included the year) and saved the results as a .csv in a different directory for later use.</p>
+<pre class="r"><code>to_xls &lt;- &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/&quot;
+
+files &lt;- list.files(path = to_xls, full.names = TRUE)
+
+Make_Year &lt;- function(folder){
+    files &lt;- list.files(path = folder, full.names = TRUE)
+    for(i in 1:length(files)){
+        curr_year &lt;- gsub(folder, &quot;&quot;, files[i])
+        curr_year &lt;- gsub(&quot;/gc&quot;, &quot;&quot;, curr_year)
+        curr_year &lt;- gsub(&quot;.xls&quot;, &quot;&quot;, curr_year)
+        data &lt;- read.xls(files[i])
+        names(data) &lt;- c(&quot;Variety&quot;, &quot;Base.Price.Per.Ton&quot;, &quot;Trash&quot;, &quot;Brix.Code&quot;, &quot;Tons&quot;)
+        data$Year &lt;- curr_year
+        write.csv(data, 
+            paste0(&quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/clean_csv/gc&quot;, curr_year, &quot;.csv&quot;),
+            row.names = FALSE)
+    }
+}
+
+Make_Year(to_xls)</code></pre>
+</div>
+<div id="building-a-dictionary-for-wine-varieties-and-districts" class="section level2">
+<h2>Building a dictionary for wine varieties and districts</h2>
+<p>At some point in the data cleaning process, we’re going to need a way to parse the unneeded rows in the dataset from the rows with data we want to keep. We can either do this by:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>excluding all the rows we don’t need or</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>finding a way to lift out the rows we want.</li>
+</ol></li>
+</ul>
+<p>Since we’re going to be processing multiple Section 8’s over a long period of time from the dataset, and since we can’t assume that this data has all been processed excactly the same way (the files could and probably were loaded in the year the report was published, giving 13 years for potential changes in processes). Some of the rows even include footnotes, and since going through 150,000 rows of data looking for each unique string of characters I don’t want seems a little inefficient, I think (2) will be the safer assumption.</p>
+<p>Section 8 is what we want, but we’ll start with another section to pull out a list of wine varieties included in the dataset. Section 2 is less than 200 rows long, and each unique variety has it’s own row.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">TABLE.2…TONS.OF.GRAPES.CRUSHED.BY.CALIFORNIA.PROCESSORS</th>
+<th align="left">X</th>
+<th align="left">X.1</th>
+<th align="left">X.2</th>
+<th align="left">X.3</th>
+<th align="left">X.4</th>
+<th align="left">X.5</th>
+<th align="left">X.6</th>
+<th align="left">X.7</th>
+<th align="left">X.8</th>
+<th align="left">X.9</th>
+<th align="left">X.10</th>
+<th align="left">X.11</th>
+<th align="left">X.12</th>
+<th align="left">X.13</th>
+<th align="right">X.14</th>
+<th align="left">X.15</th>
+<th align="left">X.16</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2</td>
+<td align="left">Type and Variety</td>
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">3</td>
+<td align="left">4</td>
+<td align="left">5</td>
+<td align="left">6</td>
+<td align="left">7</td>
+<td align="left">8</td>
+<td align="left">9</td>
+<td align="left">10</td>
+<td align="left">11</td>
+<td align="left">12</td>
+<td align="left">13</td>
+<td align="left">14</td>
+<td align="right">15</td>
+<td align="left">16</td>
+<td align="left">17</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td align="left">RAISIN GRAPES:</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td align="left">Fiesta</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">11,448.0</td>
+<td align="left">1,349.9</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td align="left">Thompson Seedless</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">2.0</td>
+<td align="left">0.0</td>
+<td align="left">1,794.7</td>
+<td align="left">0.5</td>
+<td align="left">99.9</td>
+<td align="left">53,983.2</td>
+<td align="left">21,451.2</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td align="left">Other Raisin 1/</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">5.1</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td align="left">Total Raisin</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">2.0</td>
+<td align="left">0.0</td>
+<td align="left">1,794.7</td>
+<td align="left">0.5</td>
+<td align="left">99.9</td>
+<td align="left">65,436.3</td>
+<td align="left">22,801.1</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td align="left">TABLE GRAPES:</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="right">NA</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td>12</td>
+<td align="left">Allison</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">62.3</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="odd">
+<td>13</td>
+<td align="left">Autumn King</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">61.4</td>
+<td align="left">7,706.3</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>14</td>
+<td align="left">Autumn Royal</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">69.6</td>
+<td align="left">3,709.1</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="odd">
+<td>15</td>
+<td align="left">Beauty Seedless *</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>16</td>
+<td align="left">Black Monukka</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="odd">
+<td>17</td>
+<td align="left">Blanc Seedless</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="even">
+<td>18</td>
+<td align="left">Calmeria</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">59.9</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+<tr class="odd">
+<td>19</td>
+<td align="left">Christmas Rose</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+<td align="left">53.6</td>
+<td align="right">0</td>
+<td align="left">0.0</td>
+<td align="left">0.0</td>
+</tr>
+</tbody>
+</table>
+<p>We only want data from the first column, since that’s where all the variety names are listed. We can just manually filter out the rows that do not have a variety name in them. It looks like Table varieties are listed in rows 5 to 6, Raisin varieties in rows 12 to 44, White in rows 50 to 94, and red in rows 99 to 162.</p>
+<pre class="r"><code>print(sec2[c(5:7,12:45,50:94,99:162),c(1)])</code></pre>
+<pre><code>##   [1] Fiesta                   Thompson Seedless       
+##   [3] Other Raisin  1/         Allison                 
+##   [5] Autumn King              Autumn Royal            
+##   [7] Beauty Seedless *        Black Monukka           
+##   [9] Blanc Seedless           Calmeria                
+##  [11] Christmas Rose           Cotton Candy            
+##  [13] Crimson Seedless *       Emerald Seedless *      
+##  [15] Emperor                  Fantasy Seedless        
+##  [17] Flame Seedless *         Flame Tokay             
+##  [19] Italia *                 Krissy                  
+##  [21] Malaga *                 Perlette                
+##  [23] Princess *               Pristine                
+##  [25] Red Globe *              Ribier                  
+##  [27] Rouge                    Ruby Seedless *         
+##  [29] Scarlet                  Scarlet Royal           
+##  [31] Sugraone *               Summer Royal            
+##  [33] Sweet Scarlet            Sweet Sunshine          
+##  [35] Timco                    Vintage Red             
+##  [37] Other Table  1/          Albarino                
+##  [39] Arneis                   Burger *                
+##  [41] Chardonnay *             Chenin Blanc            
+##  [43] Cortese                  Fiano                   
+##  [45] Flora                    Folle Blanche           
+##  [47] French Colombard         Gewurztraminer          
+##  [49] Gray Riesling *          Grenache Blanc          
+##  [51] Gruner Veltliner         Malvasia Bianca         
+##  [53] Marsanne                 Melon                   
+##  [55] Moscato Gaillo *         Muscat Blanc *          
+##  [57] Muscat Orange            Muscat of Alexandria    
+##  [59] Palomino *               Pecorino                
+##  [61] Picpoul Blanc            Pinot Blanc             
+##  [63] Pinot Gris *             Ribolla Gialla *        
+##  [65] Roussanne                Sauvignon Blanc         
+##  [67] Sauvignon Musque         Sauvignon Vert *        
+##  [69] Semillon                 St. Emilion *           
+##  [71] Sylvaner                 Symphony                
+##  [73] Tocai Friulano           Torrontes               
+##  [75] Triplett Blanc           Verdejo                 
+##  [77] Verdelho                 Vermentino *            
+##  [79] Vernaccia                Viognier                
+##  [81] White Riesling *         Other White  1/         
+##  [83] Aglianico                Aleatico                
+##  [85] Alicante Bouschet *      Arinarnoa               
+##  [87] Barbera                  Blaufraenkisch *        
+##  [89] Cabernet Franc           Cabernet Sauvignon      
+##  [91] Carignane                Carmenere               
+##  [93] Carnelian                Centurian               
+##  [95] Charbono                 Ciliegiolo              
+##  [97] Cinsaut *                Counoise                
+##  [99] Dolcetto                 Dornfelder              
+## [101] Durif                    Freisa                  
+## [103] Gamay (Napa) *           Gamay Noir Au Jus Blanc 
+## [105] Graciano                 Grenache *              
+## [107] Grignolino               Lagrein                 
+## [109] Lambrusco                Malbec                  
+## [111] Mataro *                 Merlot                  
+## [113] Meunier *                Mission                 
+## [115] Monastrell               Montepulciano           
+## [117] Muscat Hamburg *         Nebbiolo                
+## [119] Negrette *               Negroamaro              
+## [121] Nero D&#39;Avola *           Petit Verdot            
+## [123] Petite Sirah             Pinot Noir              
+## [125] Pinotage                 Primitivo               
+## [127] Refosco *                Royalty                 
+## [129] Rubired *                Ruby Cabernet           
+## [131] Sagrantino               Salvador                
+## [133] Sangiovese *             Segalin                 
+## [135] Souzao                   St Laurent              
+## [137] Syrah *                  Tannat                  
+## [139] Tempranillo *            Teroldego               
+## [141] Tinta Cao                Tinta Madeira           
+## [143] Touriga Nacional *       Trousseau *             
+## [145] Zinfandel                Other Red  1/           
+## 159 Levels:  ...</code></pre>
+<p>We’ve still got some special characters and footnotes in there, we’ll clean them up in a second. Let’s match each variety with their type, this will help us when we want to aggregate the data later on, especially when visualizing the data.</p>
+<pre class="r"><code>dict &lt;- as.data.frame(
+  cbind(
+    as.character(sec2[c(5:7,12:45,50:94,99:162),c(1)]),
+    c(rep(&quot;table&quot;, 3), rep(&quot;raisin&quot;, 34), rep(&quot;white&quot;, 45), rep(&quot;red&quot;, 64))
+    )
+  )
+
+names(dict) &lt;- c(&quot;Variety&quot;, &quot;Type&quot;)</code></pre>
+<p>Now we can clean up the variety names. We’ll want a function that can clean a vector of varieties, so in the future we can work with data from different sources and insure consistency between them (so long as the spellings are the same…).</p>
+<pre class="r"><code>clean_grape_vector &lt;- function(input){
+    input &lt;- paste0(input)
+    input &lt;- str_to_lower(input)
+    input &lt;- str_replace_all(input, &quot;[[:punct:]]&quot;, &quot;&quot;)
+    input &lt;- str_trim(input)
+}
+
+grape.dict &lt;- clean_grape_vector(dict$Variety)</code></pre>
+<p>I also built a district key. I use this later for my apps in shiny, but it’s not really necissary. I might stop storing the district descriptions with my data though, as I think it slows down computation time in my apps. I couuld always just do a dplyr::leftjoin() it to my data later when I need it.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">District_Number</th>
+<th align="left">District_Disc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="left">[2] Lake</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="left">[3] Sonoma</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="left">[4] Napa</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="left">[5] Solano</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="left">[6] North Central Coast</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="left">[7] Monterey and San Benito</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="left">[8]San Luis Obispo</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="left">[9] Northern California</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">[10] Sierra Foothills</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="left">[11] San Joaquin and Sacramento</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="left">[12] San Joaquin, Stanislaus, Merced</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="left">[13] Fresno, Madera, N. Tulare, Mono, Inyo</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="left">[14] Kern, Kings, S. Tulare</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="left">[15] L.A. and San Bernardino</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="left">[16] So Cal</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="left">[17] Yolo</td>
+</tr>
+</tbody>
+</table>
+<p>I also have a district key, so that we can lift the district numbers out of the Variety column.</p>
+<pre class="r"><code>districts &lt;- paste(rep(&quot;DISTRICT&quot;, 17), rep(1:17))
+dist_key &lt;- cbind.data.frame(districts, districts, rep(1:17)) # the redundent row gets dropped in dplyr::left_join()
+
+names(dist_key) &lt;- c(&quot;key&quot;, &quot;District&quot;, &quot;District_Number&quot;)
+dist_key$key &lt;- as.character(dist_key$key)
+dist_key$District &lt;- as.character(dist_key$District)</code></pre>
+</div>
+<div id="cleaning" class="section level2">
+<h2>Cleaning</h2>
+<p>I have all of the Section 8 scripts stored as a .xls in a folder as gc<year>.xls, which is how they came in the zip file. Then I pass it through a function which:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>truncates the file name so that only the crop year is left</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>saves the year in a vector to be used later</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: decimal">
+<li>resaves the file as a .csv to be used later</li>
+</ol></li>
+</ul>
+<p>This round of code gets the job done, and I really like that I don’t manually have to save my file as a .csv by going into excel (or for me, LibreOffice Calc). Especially as I was working on cleaning the data, and this being the first larger data set that I ever had to clean, this ended up saving me time in the long run. However, I don’t think this is optimized in the long run, and if I had to run this script every day, or every hour, there might be a more efficient way of doing this (one that didn’t involve loading the file, processing it, saving it, and loading it again). At the moment I’ll only have to run this script every year to update the data with each annual release, so I’ll leave optimization to another dataset.</p>
+<pre class="r"><code>to_xls &lt;- &quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/&quot;
+
+files &lt;- list.files(path = to_xls, full.names = TRUE)
+files
+
+Make_Year &lt;- function(folder){
+    files &lt;- list.files(path = folder, full.names = TRUE)
+    for(i in 1:length(files)){
+        curr_year &lt;- gsub(folder, &quot;&quot;, files[i])
+        curr_year &lt;- gsub(&quot;/gc&quot;, &quot;&quot;, curr_year)
+        curr_year &lt;- gsub(&quot;.xls&quot;, &quot;&quot;, curr_year)
+        print(curr_year)
+        data &lt;- read.xls(files[i])
+        names(data) &lt;- c(&quot;Variety&quot;, &quot;Base.Price.Per.Ton&quot;, &quot;Trash&quot;, &quot;Brix.Code&quot;, &quot;Tons&quot;)
+        data$Year &lt;- curr_year
+        write.csv(data, 
+            paste0(&quot;/home/dan/Data/NASS/Grape_Crush/all_section_8/clean_csv/gc&quot;, curr_year, &quot;.csv&quot;),
+            row.names = FALSE)
+    }
+}
+
+Make_Year(to_xls)</code></pre>
+<p>We’ll reimport the new .csv files from the directory we saved them in, and combine them into a single dataframe</p>
+<pre class="r"><code>files &lt;- list.files(path = to_csv, full.names = TRUE)
+imported &lt;- llply(files, read.csv, stringsAsFactors = FALSE)
+uni &lt;- ldply(imported, rbind) 
+
+uni &lt;- uni %&gt;%
+    select(Variety, Base.Price.Per.Ton, Brix.Code, Tons, Year)</code></pre>
+<p>Now we create our column of only grape crush districts, this lifts the regional identifier out of the Varieties column, which is how the data came to us.</p>
+<pre class="r"><code>uni$Variety &lt;- gsub(&quot;b/&quot;, &quot;&quot;, uni$Variety)
+uni$Variety &lt;- str_trim(uni$Variety)
+uni$Variety &lt;- gsub(&quot;(?&lt;=[\\s])\\s*|^\\s+|\\s+$&quot;, &quot;&quot;, uni$Variety, perl=TRUE)
+
+g.crush &lt;- left_join(uni, dist_key, by = c(&quot;Variety&quot; = &quot;key&quot;))</code></pre>
+<p>Now that we’ve created columns with districts and years in them, we can fill out the columns so that each price and tonnage data point includes a year and grown district. We’ll also use our clean_grape_vector() function to clean up the raw variety vector.</p>
+<pre class="r"><code>g.crush$Variety &lt;- clean_grape_vector(g.crush$Variety)
+g.crush$Variety[g.crush$Variety == &quot;&quot;] &lt;- NA
+g.crush$Year[g.crush$Year == &quot;&quot;] &lt;- NA
+
+full.g.crush &lt;- g.crush %&gt;%
+    fill(District)%&gt;%
+    fill(Variety) %&gt;%
+    fill(Year) %&gt;%
+    fill(District_Number)</code></pre>
+<p>Now we’re ready to kick out all of the non-wine variety data from the Variety column. We’ll do an inner_join() with our grape variety dictionary.</p>
+<pre class="r"><code>grape.dict$Variety &lt;- as.character(grape.dict$Variety)
+clean.g.crush &lt;- inner_join(full.g.crush, grape.dict, by = &quot;Variety&quot;)</code></pre>
+<p>And to make them useful as numbers, we’ll take the comma’s out of the price and tonnage columns, and resave them as numeric vectors. Then we’ll filter out any rows without prices.</p>
+<pre class="r"><code>clean.g.crush$Base.Price.Per.Ton &lt;- gsub(&quot;,&quot;, &quot;&quot;, clean.g.crush$Base.Price.Per.Ton)
+clean.g.crush$Tons &lt;- gsub(&quot;,&quot;, &quot;&quot;, clean.g.crush$Tons)
+clean.g.crush$Base.Price.Per.Ton &lt;- as.numeric(clean.g.crush$Base.Price.Per.Ton)
+clean.g.crush$Tons &lt;- as.numeric(clean.g.crush$Tons)
+
+gc &lt;- clean.g.crush %&gt;%
+    filter(Base.Price.Per.Ton &gt; 0) %&gt;%
+    arrange(Year)</code></pre>
+<p>We’ll add our district discriptions.</p>
+<pre class="r"><code>gc &lt;- gc %&gt;%
+  left_join(district_desc)</code></pre>
+<p>And we’ve got our data!</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variety</th>
+<th align="right">Base.Price.Per.Ton</th>
+<th align="right">Brix.Code</th>
+<th align="right">Tons</th>
+<th align="right">Year</th>
+<th align="left">District</th>
+<th align="right">District_Number</th>
+<th align="left">Type</th>
+<th align="left">District_Disc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">arneis</td>
+<td align="right">1200.0</td>
+<td align="right">100</td>
+<td align="right">0.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">arneis</td>
+<td align="right">1250.0</td>
+<td align="right">100</td>
+<td align="right">1.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">473.7</td>
+<td align="right">9400</td>
+<td align="right">267.5</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="even">
+<td align="left">chardonnay</td>
+<td align="right">500.0</td>
+<td align="right">100</td>
+<td align="right">108.9</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+<tr class="odd">
+<td align="left">chardonnay</td>
+<td align="right">500.0</td>
+<td align="right">17000</td>
+<td align="right">60.4</td>
+<td align="right">2005</td>
+<td align="left">DISTRICT 1</td>
+<td align="right">1</td>
+<td align="left">white</td>
+<td align="left">[1] Mendocino</td>
+</tr>
+</tbody>
+</table>
+<p>Save it and enjoy =)</p>
+</div>
+
+              
+            </div>
+          </div>
+          <div id="post-footer" class="post-footer main-content-wrap">
+            
+              
+            
+            
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/california-wine----part-1/" data-tooltip="California Wine  - Part 1">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=/2017/11/cleaning-data/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=/2017/11/cleaning-data/">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=/2017/11/cleaning-data/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+            
+              
+                <div id="disqus_thread">
+  <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+              
+            
+          </div>
+        </article>
+        <footer id="footer" class="main-content-wrap">
+  <span class="copyrights">
+    &copy; 2017 Daniel Mikel. All Rights Reserved
+  </span>
+</footer>
+
+      </div>
+      <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+        
+  <div class="post-actions-wrap">
+      <nav >
+        <ul class="post-actions post-action-nav">
+          
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2017/11/california-wine----part-1/" data-tooltip="California Wine  - Part 1">
+              
+                  <i class="fa fa-angle-left"></i>
+                  <span class="hide-xs hide-sm text-small icon-ml">NEXT</span>
+                </a>
+            </li>
+            <li class="post-action">
+              
+                <a class="post-action-btn btn btn--disabled">
+              
+                  <span class="hide-xs hide-sm text-small icon-mr">PREVIOUS</span>
+                  <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+          
+        </ul>
+      </nav>
+    <ul class="post-actions post-action-share" >
+      
+        <li class="post-action hide-lg hide-md hide-sm">
+          <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions">
+            <i class="fa fa-share-alt"></i>
+          </a>
+        </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://www.facebook.com/sharer/sharer.php?u=/2017/11/cleaning-data/">
+              <i class="fa fa-facebook-official"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://twitter.com/intent/tweet?text=/2017/11/cleaning-data/">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </li>
+        
+          <li class="post-action hide-xs">
+            <a class="post-action-btn btn btn--default" target="new" href="https://plus.google.com/share?url=/2017/11/cleaning-data/">
+              <i class="fa fa-google-plus"></i>
+            </a>
+          </li>
+        
+      
+      
+        <li class="post-action">
+          <a class="post-action-btn btn btn--default" href="#disqus_thread">
+            <i class="fa fa-comment-o"></i>
+          </a>
+        </li>
+      
+      <li class="post-action">
+        
+          <a class="post-action-btn btn btn--default" href="#">
+        
+          <i class="fa fa-list"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+
+      </div>
+      <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+  <i id="btn-close-shareoptions" class="fa fa-close"></i>
+  <ul class="share-options">
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://www.facebook.com/sharer/sharer.php?u=%2F2017%2F11%2Fcleaning-data%2F">
+          <i class="fa fa-facebook-official"></i><span>Share on Facebook</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://twitter.com/intent/tweet?text=%2F2017%2F11%2Fcleaning-data%2F">
+          <i class="fa fa-twitter"></i><span>Share on Twitter</span>
+        </a>
+      </li>
+    
+      <li class="share-option">
+        <a class="share-option-btn" target="new" href="https://plus.google.com/share?url=%2F2017%2F11%2Fcleaning-data%2F">
+          <i class="fa fa-google-plus"></i><span>Share on Google&#43;</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+<div id="share-options-mask" class="share-options-mask"></div>
+    </div>
+    
+    <div id="about">
+  <div id="about-card">
+    <div id="about-btn-close">
+      <i class="fa fa-remove"></i>
+    </div>
+    
+      <img id="about-card-picture" src="//www.gravatar.com/avatar/592086535255154a127066fa0929a42c?s=110" alt="Author&#39;s picture" />
+    
+    <h4 id="about-card-name">Daniel Mikel</h4>
+    
+      <div id="about-card-bio">Super bio with markdown support <strong>COOL</strong></div>
+    
+    
+    
+      <div id="about-card-location">
+        <i class="fa fa-map-marker"></i>
+        <br/>
+        Sacramento, CA
+      </div>
+    
+  </div>
+</div>
+
+    <div id="algolia-search-modal" class="modal-container">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="close-button"><i class="fa fa-close"></i></span>
+      <a href="https://algolia.com" target="_blank" rel="noopener" class="searchby-algolia text-color-light link-unstyled">
+        <span class="searchby-algolia-text text-color-light text-small">by</span>
+        <img class="searchby-algolia-logo" src="https://www.algolia.com/static_assets/images/press/downloads/algolia-light.svg">
+      </a>
+      <i class="search-icon fa fa-search"></i>
+      <form id="algolia-search-form">
+        <input type="text" id="algolia-search-input" name="search"
+          class="form-control input--large search-input" placeholder="Search" />
+      </form>
+    </div>
+    <div class="modal-body">
+      <div class="no-result text-color-light text-center">no post found</div>
+      <div class="results">
+        
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/11/california-wine----part-1/">
+                <h3 class="media-heading">California Wine  - Part 1</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">The United States Department of Agriculture publishes contract level price and volume data for California grapes crushed and used for wine. This allows us to see each purchase of a wine variety, what variety, it’s price, and the tonnage in the purchased amoung, giving us a disaggregated level data of data ripe for analysis. This is intended to be the first in a series of blog posts analysing the dynamics of the California.</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+          <div class="media">
+            
+            <div class="media-body">
+              <a class="link-unstyled" href="/2017/11/cleaning-data/">
+                <h3 class="media-heading">Cleaning Data</h3>
+              </a>
+              <span class="media-meta">
+                <span class="media-date text-small">
+                  Nov 11, 2017
+                </span>
+              </span>
+              <div class="media-content hide-xs font-merryweather">California Wine The first project I’m going to work on is with California Wine Grape Data. The data we’ll start with is hosted by the United States Department of Agriculture’s Grape Crush Report which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract.
+California Grape Price Districts Image</div>
+            </div>
+            <div style="clear:both;"></div>
+            <hr>
+          </div>
+        
+      </div>
+    </div>
+    <div class="modal-footer">
+      <p class="results-count text-medium"
+         data-message-zero="no post found"
+         data-message-one="1 post found"
+         data-message-other="{n} posts found">
+         2 posts found
+      </p>
+    </div>
+  </div>
+</div>
+    
+  
+    
+    <div id="cover" style="background-image:url('/images/cover.jpg');"></div>
+  
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.7/js/jquery.fancybox.min.js" integrity="sha256-GEAnjcTqVP+vBp3SSc8bEDQqvWAZMiHyUSIorrWwH50=" crossorigin="anonymous"></script>
+
+
+<script src="/js/script-qi9wbxp2ya2j6p7wx1i6tgavftewndznf4v0hy2gvivk1rxgc3lm7njqb6bz.min.js"></script>
+
+
+
+<script>
+$(document).ready(function() {
+  hljs.configure({ classPrefix: '', useBR: false });
+  $('pre.code-highlight > code, pre > code').each(function(i, block) {
+    if (!$(this).hasClass('codeblock')) {
+      $(this).addClass('codeblock');
+    }
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+
+
+  
+    
+      <script>
+        var disqus_config = function () {
+          this.page.url = '\/2017\/11\/cleaning-data\/';
+          
+            this.page.identifier = '\/2017\/11\/cleaning-data\/'
+          
+        };
+        (function() {
+          
+          
+          if (window.location.hostname == "localhost") {
+            return;
+          }
+          var d = document, s = d.createElement('script');
+          var disqus_shortname = 'hugo-tranquilpeak-theme';
+          s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+        })();
+      </script>
+    
+  
+
+
+
+    
+  </body>
+</html>
+
