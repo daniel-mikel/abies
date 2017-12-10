@@ -3,7 +3,7 @@ title: "Cleaning Data"
 author: "Daniel Mikel"
 date: "2017-11-27T21:13:14-05:00"
 output: html_document
-coverImage: "static/post/2015-07-23-r-rmarkdown_files/figure-html/gc_districts.png"
+coverImage: "/images/gc_districts.png"
 ---
 
 ```{r, echo = FALSE, message = FALSE}
@@ -15,7 +15,7 @@ library("knitr")
 
 The first project I'm going to work on is with California Wine Grape Data. The data we'll start with is hosted by the [United States Department of Agriculture's Grape Crush Report](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) which collects wine price, production, and acreage for California by wine variety disaggregated to either the Grape Price District (this can mean one county or several counties) or the individual grape purchasing contract. 
 
-![California Grape Price Districts Image](static/post/2015-07-23-r-rmarkdown_files/figure-html/gc_districts.png)
+![California Grape Price Districts Image](/images/gc_districts.png)
 
 This California Wine has some interesting potential for future projects. On a personal level it will be good to practice to work with a real data set, and it's not like wine is completely unrelatable (even if I'm more of a beer person). It also presents fodder for furthering the project, ideas like scraping winery and wine sales to analyze mark up prices, or modeling price and production based on rainfall and temperture are some feasible next steps I could take this data. Even working just with the price and production data from the Grape Crush Report will give me practice cleaning data, working with tidyr and dplyr to manipulate a large dataset, and using ggplot2 and shiny to visualize data. 
 
