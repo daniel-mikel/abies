@@ -6,7 +6,7 @@ output:
   html_document:
     toc: true
     toc_depth: 2
-coverImage: "/images/gc_districts.png"
+coverImage: "/FAIL/images/gc_districts.png"
 thumbnail_image: "/images/gc_districts.png"
 thumbnail_image_position: "left"
 ---
@@ -41,7 +41,7 @@ I've loaded library("gdata") for the read.xls() function, library("tidyverse") m
 gc2016 <- read.xls("/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/gc2016.xls")
 names(gc2016) <- c("District, Type, and Variety", "Base Price Per Ton", "NA", "Brix Factors", "Tons")
 
-knitr::kable(gc2016[2:16,1:5])
+gc2016[2:16,1:5]
 ```
 
 A few things now come to mind:
