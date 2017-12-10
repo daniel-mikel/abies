@@ -2,13 +2,7 @@
 title: "Cleaning Data"
 author: "Daniel Mikel"
 date: "2017-11-27T21:13:14-05:00"
-output: 
-  html_document:
-    df_print: paged
-    toc: true
-    toc_depth: 2
-    theme: united
-    highlight: tango
+output: html_document
 ---
 
 ```{r, echo = FALSE, message = FALSE}
@@ -37,12 +31,13 @@ library("gdata")
 
 I've loaded library("gdata") for the read.xls() function, library("tidyverse") mostly out of habit but also for dplyr joins, library("stringr") will be used later for manipulating character vectors, and libary("plyr") for some apply() functions that don't come with base R. I've saved all of the .xls files from [The USDA](https://www.nass.usda.gov/Statistics_by_State/California/Publications/Grape_Crush/Reports/) and put all of the section 8 files in their own folder. There are over 17,000 rows of data, so we'll just look at the first 15
 
-```{r, echo = FALSE, max.print=1}
+```{r, echo = FALSE, results = 'asis', fig.width = 9}
 gc2016 <- read.xls("/home/dan/Data/NASS/Grape_Crush/all_section_8/xls/gc2016.xls")
 names(gc2016) <- c("District, Type, and Variety", "Base Price Per Ton", "NA", "Brix Factors", "Tons")
 
-gc2016[2:16,1:5]
+knitr::kable(gc2016[2:16,1:5])
 ```
+
 
 A few things now come to mind:
 
