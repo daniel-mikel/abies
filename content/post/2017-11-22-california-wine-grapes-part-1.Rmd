@@ -37,13 +37,13 @@ cols <- c("red" = "#F8766D", "white" = "#00BFC4", "raisin" = "#C77CFF", "table" 
 gc %>%
   filter(Year == 2016) %>%
   group_by(District_Disc, District_Number, Type) %>%
-  summarise(Thousand_Tons = sum(Tons)/1000) %>%
+  summarise(Tons = sum(Tons)) %>%
   arrange(District_Number) %>%
-  ggplot(aes(x = as.factor(District_Number), y = Thousand_Tons, fill = Type)) +
+  ggplot(aes(x = as.factor(District_Number), y = Tons, fill = Type)) +
   geom_col() + 
   scale_fill_manual(values = cols) +
   xlab(NULL) + 
-  ylab("Thousand Tons Sold") + 
+  ylab("Tons Sold") + 
   scale_x_discrete(labels = c("1" = "[1] Mendocino",
                               "2" = "[2] Lake",
                               "3" = "[3] Sonoma",
@@ -61,6 +61,7 @@ gc %>%
                               "15" = "[15] L.A. and San Bernardino",
                               "16" = "[16] So Cal",
                               "17" = "[17] Yolo")) +
+  scale_y_continuous(labels = scales::comma) +
   ggtitle("Grape Production in Tons by District") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))  

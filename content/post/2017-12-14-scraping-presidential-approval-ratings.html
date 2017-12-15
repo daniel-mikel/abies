@@ -1,0 +1,94 @@
+---
+title: "Scraping Presidential Approval"
+author: "Daniel Mikel"
+date: "2017-12-14T21:19:12-05:00"
+output: html_document
+---
+
+
+
+<p>This is my first data scrapping project. I’ve taken a few tutorials in the past, but never really took the time to try out the technique. Data scrapping seems like a pretty handy tool to have in a world where people really don’t give a shit if you can use their data (and sometimes discourage it).</p>
+<p>I’ve been pretty much addicted to 538 politics since at least 2012, but probably before that. And by probably addicted I mean that I am. So it makes sense that I would try to funnel my addiction into more productive outlets.</p>
+<p>Originally I was looking for US congressional election data, which I’ve still got my eye out for (a convenient place to take historical data, individual election results are pretty easy to find). I stumbled onto this database/web app from the University of California at Santa Barbara’s <a href="http://www.presidency.ucsb.edu/index.php">The American Presidency Project</a>. It’s a pretty sweet place that I’ll probably frequent for future projects. They also host US Presidential approval rates since July 1941. We’ll start with scrapping Obama’s presidential approval ratings.</p>
+<p>We’ll need a few packages for this project:</p>
+<pre class="r"><code>library(&quot;rvest&quot;)
+library(&quot;tidyverse&quot;)
+library(&quot;zoo&quot;)</code></pre>
+<ul>
+<li><p><strong>rvest</strong> will be used to scrape the data from the website</p></li>
+<li><p><strong>tidyverse</strong> will be used for manipulating the data and graphing it (tidyverse includes several packages, of which dplyr, tidyr, and ggplot2, which are the packages from the tidyverse we’ll actually be using</p></li>
+<li><p><strong>zoo</strong> which is handy for manipulating dates, we’ll use this to create rolling averages of our data for graphing</p></li>
+</ul>
+<p>We’ll also use the google chrome plugin SelectorGaget, for identifying html code when scraping. I have a screenshot below of what it looks like after selecting the appropriate area. In SelectorGaget green represents the area you’ve clicked to tell it you want that object, yellow represent what it thinks you want, and red represents areas you’ve clicked to unselect from the objects you want. It’s easier than it sounds.</p>
+<div class="figure">
+<img src="/images/ucsb_pres_1.png" alt="SelectorGaget Example" />
+<p class="caption">SelectorGaget Example</p>
+</div>
+<p>Now we’ll copy paste the website into R, save it as the string my_url like we would a file directory and use rvest’s read_html() function to read the website into R in a way that R understands. We’ll scrape the data we want with rvest::html_nodes(), supplying it with the object we created from read_html() and the css path we got from SelectorGaget. Then we convert these html nodes to a character vector with html_text(), the argument tell’s R to delete white space character strings in our vector.</p>
+<pre class="r"><code>my_url &lt;- &#39;http://www.presidency.ucsb.edu/data/popularity.php?pres=44&amp;sort=time&amp;direct=DESC&amp;Submit=DISPLAY&#39;
+
+my_webpage &lt;- read_html(my_url)
+
+approval_html &lt;- html_nodes(my_webpage, &#39;.listdate&#39;)
+approval_data &lt;- html_text(approval_html, trim = TRUE)</code></pre>
+<p>Let’s see what we have:</p>
+<pre class="r"><code>length(approval_data)</code></pre>
+<pre><code>## [1] 19510</code></pre>
+<pre class="r"><code>head(approval_data, n = 31)</code></pre>
+<pre><code>##  [1] &quot;&quot;             &quot;Barack Obama&quot; &quot;01/17/2017&quot;   &quot;01/19/2017&quot;  
+##  [5] &quot;&quot;             &quot;59&quot;           &quot;37&quot;           &quot;4&quot;           
+##  [9] &quot;&quot;             &quot;01/15/2017&quot;   &quot;01/18/2017&quot;   &quot;&quot;            
+## [13] &quot;58&quot;           &quot;38&quot;           &quot;4&quot;            &quot;&quot;            
+## [17] &quot;01/14/2017&quot;   &quot;01/17/2017&quot;   &quot;&quot;             &quot;57&quot;          
+## [21] &quot;39&quot;           &quot;4&quot;            &quot;&quot;             &quot;01/13/2017&quot;  
+## [25] &quot;01/15/2017&quot;   &quot;&quot;             &quot;57&quot;           &quot;38&quot;          
+## [29] &quot;5&quot;            &quot;&quot;             &quot;01/12/2017&quot;</code></pre>
+<p>So the data is a little messy out of the box. We’ve got 19,510 points of data, and some of them are even useful! It’s an easy fix. We just need to clean up the empty character strings, and delete the first string with positive data in it, since it doesn’t fit the larger pattern.</p>
+<pre class="r"><code>approval_data[approval_data==&quot;&quot;] &lt;- NA
+approval_data[1:2] &lt;- NA
+approval_data &lt;- na.omit(approval_data)
+head(approval_data, n = 25)</code></pre>
+<pre><code>##  [1] &quot;01/17/2017&quot; &quot;01/19/2017&quot; &quot;59&quot;         &quot;37&quot;         &quot;4&quot;         
+##  [6] &quot;01/15/2017&quot; &quot;01/18/2017&quot; &quot;58&quot;         &quot;38&quot;         &quot;4&quot;         
+## [11] &quot;01/14/2017&quot; &quot;01/17/2017&quot; &quot;57&quot;         &quot;39&quot;         &quot;4&quot;         
+## [16] &quot;01/13/2017&quot; &quot;01/15/2017&quot; &quot;57&quot;         &quot;38&quot;         &quot;5&quot;         
+## [21] &quot;01/12/2017&quot; &quot;01/14/2017&quot; &quot;57&quot;         &quot;39&quot;         &quot;4&quot;</code></pre>
+<p>It looks like we’ve got a clear pattern now. The dates correspond to the date range of the polling, then we have the approval rating, disapproval rating, and undecided rating. That makes 5 columns of data for the entirety of the set. We can convert this into a data frame now.</p>
+<pre class="r"><code>obama_matrix &lt;- matrix(approval_data, ncol = 5, byrow = TRUE)
+obama_df &lt;- as.data.frame(obama_matrix, stringsAsFactors = FALSE)
+names(obama_df) &lt;- c(&quot;start_date&quot;, &quot;end_date&quot;, &quot;approve&quot;, &quot;disapprove&quot;, &quot;unsure&quot;)</code></pre>
+<p>Now we need to get everything out of a character vector.</p>
+<pre class="r"><code>obama_df[] &lt;- lapply(obama_df, type.convert)
+
+obama_df$start_date &lt;- as.Date(obama_df$start_date, 
+                               format = &quot;%m/%d/%Y&quot;)
+obama_df$end_date &lt;- as.Date(obama_df$end_date, 
+                             format = &quot;%m/%d/%Y&quot;)
+
+str(obama_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2787 obs. of  5 variables:
+##  $ start_date: Date, format: &quot;2017-01-17&quot; &quot;2017-01-15&quot; ...
+##  $ end_date  : Date, format: &quot;2017-01-19&quot; &quot;2017-01-18&quot; ...
+##  $ approve   : int  59 58 57 57 57 58 57 57 55 56 ...
+##  $ disapprove: int  37 38 39 38 39 37 40 40 42 40 ...
+##  $ unsure    : int  4 4 4 5 4 5 3 3 3 0 ...</code></pre>
+<p>And we can see what we have with a quick plot.</p>
+<pre class="r"><code>ggplot(obama_df, aes(x = end_date, y = approve)) +
+  geom_point() </code></pre>
+<p><img src="/post/2017-12-14-scraping-presidential-approval-ratings_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Now lets manipulate the data a little bit, so it’s easier to plot.</p>
+<pre class="r"><code>tidy_obama &lt;- obama_df %&gt;%
+  gather(opinion, percent, -c(start_date, end_date))
+
+ggplot(tidy_obama, aes(x = end_date, y = percent, group = opinion, col = opinion)) +
+  geom_jitter()</code></pre>
+<p><img src="/post/2017-12-14-scraping-presidential-approval-ratings_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>We’ve got a lot of data points on that plot. about 2787 per each type of rating actually. If we want a more easily interpretable plot we should adjust the opacity of the scatter plot, then we can add a moving average to more easily track the data actually being presented.</p>
+<pre class="r"><code>ggplot(tidy_obama, aes(x = end_date, y = percent, group = opinion, col = opinion)) +
+  geom_jitter(alpha = 0.5, shape = 1) +
+  geom_line(aes(y=rollmean(percent, 15, na.pad=TRUE)), size = 1.3, alpha = 0.8) +
+  theme_minimal() </code></pre>
+<pre><code>## Warning: Removed 14 rows containing missing values (geom_path).</code></pre>
+<p><img src="/post/2017-12-14-scraping-presidential-approval-ratings_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>At first I tried a loess function to smooth the groupings but didn’t get a result I wanted. Then I googled my way to stackoverflow, which is how I solve most of my R related issues, and found the rollmean() function from the zoo package. It gave me the result I was looking for.</p>
+<p>As a further note, when you select a new president in the UCSB web app, the URL changes the middle two digit number to the number of the presidency. I think it would be easy to build a web crawler from this, since it would be pretty easy to create a function that will scrape all of the presidential approval ratings. But honestly it’s 9 pm and I’m well on my way to putting in 60 hours at work this week, so that will have to wait until another day.</p>

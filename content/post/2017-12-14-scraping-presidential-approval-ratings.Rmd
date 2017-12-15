@@ -1,0 +1,112 @@
+---
+title: "Scraping Presidential Approval"
+author: "Daniel Mikel"
+date: "2017-12-14T21:19:12-05:00"
+output: html_document
+---
+
+This is my first data scrapping project. I've taken a few tutorials in the past, but never really took the time to try out the technique. Data scrapping seems like a pretty handy tool to have in a world where people really don't give a shit if you can use their data (and sometimes discourage it). 
+
+I've been pretty much addicted to 538 politics since at least 2012, but probably before that. And by probably addicted I mean that I am. So it makes sense that I would try to funnel my addiction into more productive outlets. 
+
+Originally I was looking for US congressional election data, which I've still got my eye out for (a convenient place to take historical data, individual election results are pretty easy to find). I stumbled onto this database/web app from the University of California at Santa Barbara's [The American Presidency Project](http://www.presidency.ucsb.edu/index.php). It's a pretty sweet place that I'll probably frequent for future projects. They also host US Presidential approval rates since July 1941. We'll start with scrapping Obama's presidential approval ratings.
+
+We'll need a few packages for this project:
+
+```{r, echo = FALSE, message = FALSE}
+library("png")
+library("knitr")
+```
+
+```{r, message = FALSE}
+library("rvest")
+library("tidyverse")
+library("zoo")
+```
+
+* **rvest** will be used to scrape the data from the website
+
+* **tidyverse** will be used for manipulating the data and graphing it (tidyverse includes several packages, of which dplyr, tidyr, and ggplot2, which are the packages from the tidyverse we'll actually be using
+
+* **zoo** which is handy for manipulating dates, we'll use this to create rolling averages of our data for graphing
+
+We'll also use the google chrome plugin SelectorGaget, for identifying html code when scraping. I have a screenshot below of what it looks like after selecting the appropriate area. In SelectorGaget green represents the area you've clicked to tell it you want that object, yellow represent what it thinks you want, and red represents areas you've clicked to unselect from the objects you want. It's easier than it sounds.
+
+![SelectorGaget Example](/images/ucsb_pres_1.png)
+
+Now we'll copy paste the website into R, save it as the string my_url like we would a file directory and use rvest's read_html() function to read the website into R in a way that R understands. We'll scrape the data we want with rvest::html_nodes(), supplying it with the object we created from read_html() and the css path we got from SelectorGaget. Then we convert these html nodes to a character vector with html_text(), the argument `r trim = TRUE` tell's R to delete white space character strings in our vector. 
+
+```{r, message = FALSE}
+my_url <- 'http://www.presidency.ucsb.edu/data/popularity.php?pres=44&sort=time&direct=DESC&Submit=DISPLAY'
+
+my_webpage <- read_html(my_url)
+
+approval_html <- html_nodes(my_webpage, '.listdate')
+approval_data <- html_text(approval_html, trim = TRUE)
+```
+
+Let's see what we have:
+
+```{r}
+length(approval_data)
+head(approval_data, n = 31)
+```
+
+So the data is a little messy out of the box. We've got 19,510 points of data, and some of them are even useful! It's an easy fix. We just need to clean up the empty character strings, and delete the first string with positive data in it, since it doesn't fit the larger pattern.
+
+```{r}
+approval_data[approval_data==""] <- NA
+approval_data[1:2] <- NA
+approval_data <- na.omit(approval_data)
+head(approval_data, n = 25)
+```
+
+It looks like we've got a clear pattern now. The dates correspond to the date range of the polling, then we have the approval rating, disapproval rating, and undecided rating. That makes 5 columns of data for the entirety of the set. We can convert this into a data frame now. 
+
+```{r}
+obama_matrix <- matrix(approval_data, ncol = 5, byrow = TRUE)
+obama_df <- as.data.frame(obama_matrix, stringsAsFactors = FALSE)
+names(obama_df) <- c("start_date", "end_date", "approve", "disapprove", "unsure")
+```
+
+Now we need to get everything out of a character vector.
+```{r}
+obama_df[] <- lapply(obama_df, type.convert)
+
+obama_df$start_date <- as.Date(obama_df$start_date, 
+                               format = "%m/%d/%Y")
+obama_df$end_date <- as.Date(obama_df$end_date, 
+                             format = "%m/%d/%Y")
+
+str(obama_df)
+```
+
+And we can see what we have with a quick plot.
+
+```{r}
+ggplot(obama_df, aes(x = end_date, y = approve)) +
+  geom_point() 
+```
+
+Now lets manipulate the data a little bit, so it's easier to plot.
+
+```{r}
+tidy_obama <- obama_df %>%
+  gather(opinion, percent, -c(start_date, end_date))
+
+ggplot(tidy_obama, aes(x = end_date, y = percent, group = opinion, col = opinion)) +
+  geom_jitter()
+```
+
+We've got a lot of data points on that plot. about `r nrow(obama_df)` per each type of rating actually. If we want a more easily interpretable plot we should adjust the opacity of the scatter plot, then we can add a moving average to more easily track the data actually being presented.
+
+```{r}
+ggplot(tidy_obama, aes(x = end_date, y = percent, group = opinion, col = opinion)) +
+  geom_jitter(alpha = 0.5, shape = 1) +
+  geom_line(aes(y=rollmean(percent, 15, na.pad=TRUE)), size = 1.3, alpha = 0.8) +
+  theme_minimal() 
+```
+
+At first I tried a loess function to smooth the groupings but didn't get a result I wanted. Then I googled my way to stackoverflow, which is how I solve most of my R related issues, and found the rollmean() function from the zoo package. It gave me the result I was looking for. 
+
+As a further note, when you select a new president in the UCSB web app, the URL changes the middle two digit number to the number of the presidency. I think it would be easy to build a web crawler from this, since it would be pretty easy to create a function that will scrape all of the presidential approval ratings. But honestly it's 9 pm and I'm well on my way to putting in 60 hours at work this week, so that will have to wait until another day. 
