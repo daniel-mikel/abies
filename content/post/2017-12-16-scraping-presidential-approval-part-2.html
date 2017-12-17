@@ -62,13 +62,14 @@ for (i in 1:(45-31)){
 tidy_pres %&gt;%
   filter(number == &quot;35&quot;) %&gt;%
   ggplot(aes(x = end_date, y = percent, col = opinion)) +
-  geom_jitter(alpha = 0.5, shape = 1) +
-  geom_smooth(method = &quot;gam&quot;,  formula = y ~ s(x, bs = &quot;cs&quot;), se = F) +
+  geom_jitter(alpha = 0.8) +
+  stat_smooth(span = 0.3, se= F) +
   scale_y_continuous(breaks = seq(0, 100, by = 10)) +
   theme_minimal() +
   theme(axis.text.x=element_text(angle=60, hjust=1)) + 
   scale_colour_manual(values = cols) + 
   ggtitle(&quot;Approval Rating: JFK&quot;, subtitle = NULL)</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
 <p><img src="/post/2017-12-16-scraping-presidential-approval-part-2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>I made a shiny app:</p>
 <iframe src="https://daniel-mikel.shinyapps.io/pres_approve_ucsb/?showcase=0" width="768" height="650px">
