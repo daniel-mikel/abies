@@ -6,7 +6,6 @@ output: html_document
 ---
 
 ```{r, echo = FALSE, message = FALSE}
-library("png")
 library("knitr")
 
 tidy_pres <- read.csv("/home/dan/R/projects/get_election_data/presidential approval ratings/pres_approve_ucsb_prod/pres_approve_ucsb/tidy_pres.csv", 
@@ -22,6 +21,7 @@ I used two packages for this project: rvest for scrapping the data from the web,
 ```{r, message = FALSE}
 library("rvest")
 library("tidyverse")
+library("zoo")
 library("scales")
 ```
 
@@ -80,19 +80,19 @@ tidy_pres <- all_pres %>%
 Now we can graph whichever POTUS' approval rating we feel like.
 
 ```{r}
+
 cols <- c("approve" = "#8BBF9F", "disapprove" = "#F7A278", "unsure" = "#A4BFEB")
 
 tidy_pres %>%
-  filter(number == "34") %>%
+  filter(number == "35") %>%
   ggplot(aes(x = end_date, y = percent, col = opinion)) +
   geom_jitter(alpha = 0.5, shape = 1) +
   geom_smooth(method = "gam",  formula = y ~ s(x, bs = "cs"), se = F) +
   scale_y_continuous(breaks = seq(0, 100, by = 10)) +
-  ylab("Percent") +
-  xlab(NULL) +
   theme_minimal() +
   theme(axis.text.x=element_text(angle=60, hjust=1)) + 
-  scale_colour_manual(values = cols)
+  scale_colour_manual(values = cols) + 
+  ggtitle("Approval Rating: JFK", subtitle = NULL)
 ```
 
 I made a shiny app:
