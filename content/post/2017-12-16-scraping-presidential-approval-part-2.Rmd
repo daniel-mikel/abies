@@ -106,7 +106,7 @@ knitr::include_app("https://daniel-mikel.shinyapps.io/pres_approve_ucsb/",
 
 ```
 
-The visual style is pretty similar to the (FiveThirtyEight's Trump Approval Tracker)[https://projects.fivethirtyeight.com/trump-approval-ratings/], just with less functionallity and data. I should really come up with a more distinct visual style...
+The visual style is pretty similar to the FiveThirtyEight's  [Trump Approval Tracker](https://projects.fivethirtyeight.com/trump-approval-ratings/), just with less functionallity and less data. I should really come up with a more distinct visual style...
 
 I've used shiny a few times for posting interactive graphics online. I've been having a pretty weird problem with it recently when filtering variables selected through the ui it will randomly drop one of the values in a variable. It's not like it doesn't work or it breaks the app, the app works fine, but shiny will randomly discriminate with a single value sometimes. This time it's Barack Obama (number = 44) and in my grape crush shiny apps it's been San Luis Obispo. I've tried changing the call in the ui from  selectizeInput() to sliderInput(), changing my filtering from dplyr::filter() to df[df$var == "value"] and shiny will still discriminate against that one value. It also works when I run the app on my computer, the error only surfaces when it's published to the shiny server. 
 
