@@ -79,7 +79,7 @@ tidy_pres <- all_pres %>%
 
 Now we can graph whichever POTUS' approval rating we feel like.
 
-```{r}
+```{r, fig_width = 9}
 
 cols <- c("approve" = "#8BBF9F", "disapprove" = "#F7A278", "unsure" = "#A4BFEB")
 
@@ -87,7 +87,7 @@ tidy_pres %>%
   filter(number == "35") %>%
   ggplot(aes(x = end_date, y = percent, col = opinion)) +
   geom_jitter(alpha = 0.8) +
-  stat_smooth(span = 0.3, se= F) +
+  geom_smooth(method = "loess", span = 0.3, se= F) +
   scale_y_continuous(breaks = seq(0, 100, by = 10)) +
   theme_minimal() +
   theme(axis.text.x=element_text(angle=60, hjust=1)) + 
@@ -104,7 +104,7 @@ knitr::include_app("https://daniel-mikel.shinyapps.io/pres_approve_ucsb/",
 
 ```
 
-For some reason running geom_smooth(method = "gam") was tripping an error when publishing on the shiny server. I ended up just switching to a loess function, but I wasn't happy that I couldn't find a direct fix. 
+For some reason running geom_smooth(method = "gam") was tripping an error when publishing on the shiny server. I ended up just switching to a loess function, but I wasn't happy that I couldn't find a direct fix. When I went to publish the this post through blogdown geom_smooth() wasn't rendering with the rest of the plot. 
 
 Here's the code for the shiny app:
 
