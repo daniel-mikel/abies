@@ -91,39 +91,35 @@ tidy_pres$number &lt;- as.numeric(tidy_pres$number)
 cols &lt;- c(&quot;approve&quot; = &quot;#8BBF9F&quot;, &quot;disapprove&quot; = &quot;#F7A278&quot;, &quot;unsure&quot; = &quot;#A4BFEB&quot;)
 
 ui &lt;- fluidPage(
-  
   titlePanel(&quot;Presidential Approval Rating&quot;),
-  
   fluidRow(
     column(selectizeInput(&quot;number&quot;, &quot;Select POTUS&quot;,
-                          choices = c(&quot;Franklin D. Roosevelt&quot; = &quot;32&quot;,
-                                      &quot;Harry S. Truman&quot; = &quot;33&quot;,
-                                      &quot;Dwight D. Eisenhower&quot; = &quot;34&quot;,
-                                      &quot;John F. Kennedy&quot; = &quot;35&quot;,
-                                      &quot;Lyndon B. Johnson&quot; = &quot;36&quot;,
-                                      &quot;Richard Nixon&quot; = &quot;37&quot;,
-                                      &quot;Gerald Ford&quot; = &quot;38&quot;,
-                                      &quot;Jimmy Carter&quot; = &quot;39&quot;,
-                                      &quot;Ronald Reagan&quot; = &quot;40&quot;,
-                                      &quot;George H. W. Bush&quot; = &quot;41&quot;,
-                                      &quot;Bill Clinton&quot; = &quot;42&quot;,
-                                      &quot;George W. Bush&quot; = &quot;43&quot;,
-                                      &quot;Barack Obama&quot; = &quot;44&quot;,
-                                      &quot;Donald Trump&quot; = &quot;45&quot;),
-                          selected = &quot;35&quot;),
-           width = 3),
-    
+                       choices = c(&quot;FDR&quot; = &quot;32&quot;, 
+                                   &quot;Harry S. Truman&quot; = &quot;33&quot;,
+                                   &quot;Dwight D. Eisenhower&quot; = &quot;34&quot;,
+                                   &quot;John F. Kennedy&quot; = &quot;35&quot;,
+                                   &quot;Lyndon B. Johnson&quot; = &quot;36&quot;,
+                                   &quot;Richard Nixon&quot; = &quot;37&quot;,
+                                   &quot;Gerald Ford&quot; = &quot;38&quot;,
+                                   &quot;Jimmy Carter&quot; = &quot;39&quot;,
+                                   &quot;Ronald Reagan&quot; = &quot;40&quot;,
+                                   &quot;George H. W. Bush&quot; = &quot;41&quot;,
+                                   &quot;Bill Clinton&quot; = &quot;42&quot;,
+                                   &quot;George W. Bush&quot; = &quot;43&quot;,
+                                   &quot;Barack Obama&quot; = &quot;44&quot;,
+                                   &quot;Donald Trump&quot; = &quot;45&quot;),
+                       selected = &quot;35&quot;),
+           width = 4),
     plotOutput(&quot;pres_plot&quot;)
   )
 )
 
 server &lt;- function(input, output){
-  filtered &lt;- reactive({
-    tidy_pres[tidy_pres$number == input$number,]
-  })
-  
+
   output$pres_plot &lt;- renderPlot({
-    ggplot(data = filtered(), aes(x = as.Date(end_date, format = &quot;%Y-%m-%d&quot;), y = percent, col = opinion)) +
+    tidy_pres %&gt;%
+      filter(number == input$number) %&gt;%
+      ggplot(aes(x = as.Date(end_date, format = &quot;%Y-%m-%d&quot;), y = percent, col = opinion)) +
       geom_jitter(alpha = 0.6, size = 1.5) +
       stat_smooth(span = 0.3, se= F) +
       scale_x_date(date_breaks = &quot;4 month&quot;, labels = date_format(&quot;%m-%Y&quot;)) +
@@ -133,7 +129,6 @@ server &lt;- function(input, output){
       theme_minimal() +
       theme(axis.text.x=element_text(angle=60, hjust=1)) + 
       scale_colour_manual(values = cols)
-    
   })
 }
 
