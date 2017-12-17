@@ -74,7 +74,7 @@ tidy_pres %&gt;%
 <iframe src="https://daniel-mikel.shinyapps.io/pres_approve_ucsb/?showcase=0" width="768" height="650px">
 </iframe>
 <p>The visual style is pretty similar to the (FiveThirtyEight’s Trump Approval Tracker)[<a href="https://projects.fivethirtyeight.com/trump-approval-ratings/?ex_cid=rrpromo" class="uri">https://projects.fivethirtyeight.com/trump-approval-ratings/?ex_cid=rrpromo</a>], just with less functionallity and data. I should really come up with a more distinct visual style…</p>
-<p>I’ve used shiny a few times for posting interactive graphics online. I’ve been having a pretty weird problem with it recently when filtering variables selected through the ui it will randomly drop one of the values in a variable. It’s not like it doesn’t work or it breaks the app, the app works fine, but shiny will randomly discriminate with a single value sometimes. This time it’s Barack Obama (number = 44) and in my grape crush shiny apps it’s been San Luis Obispo. I’ve tried changing the call in the ui from selectizeInput() to sliderInput(), changing my filtering from dplyr::filter() to df[df$var == “value”] and shiny will still discriminate against that one value. I’ve spent HOURS trying to figure it out.</p>
+<p>I’ve used shiny a few times for posting interactive graphics online. I’ve been having a pretty weird problem with it recently when filtering variables selected through the ui it will randomly drop one of the values in a variable. It’s not like it doesn’t work or it breaks the app, the app works fine, but shiny will randomly discriminate with a single value sometimes. This time it’s Barack Obama (number = 44) and in my grape crush shiny apps it’s been San Luis Obispo. I’ve tried changing the call in the ui from selectizeInput() to sliderInput(), changing my filtering from dplyr::filter() to df[df$var == “value”] and shiny will still discriminate against that one value. It also works when I run the app on my computer, the error only surfaces when it’s published to the shiny server.</p>
 <p>Anyways, here’s the code for the shiny app, it works for 13 of the 14 presidents:</p>
 <pre class="r"><code>library(shiny)
 library(tidyverse)
@@ -86,7 +86,7 @@ tidy_pres$start_date &lt;- as.Date(tidy_pres$start_date,
                                 format = &quot;%Y-%m-%d&quot;)
 tidy_pres$end_date &lt;- as.Date(tidy_pres$end_date, 
                               format = &quot;%Y-%m-%d&quot;)
-tidy_pres$number &lt;- as.numeric(tidy_pres$number)
+tidy_pres$number &lt;- as.factor(tidy_pres$number)
 
 cols &lt;- c(&quot;approve&quot; = &quot;#8BBF9F&quot;, &quot;disapprove&quot; = &quot;#F7A278&quot;, &quot;unsure&quot; = &quot;#A4BFEB&quot;)
 
@@ -104,10 +104,10 @@ ui &lt;- fluidPage(
                                    &quot;Jimmy Carter&quot; = &quot;39&quot;,
                                    &quot;Ronald Reagan&quot; = &quot;40&quot;,
                                    &quot;George H. W. Bush&quot; = &quot;41&quot;,
-                                   &quot;Bill Clinton&quot; = &quot;42&quot;,
+                                   &quot;Bill J. Clinton&quot; = &quot;42&quot;,
                                    &quot;George W. Bush&quot; = &quot;43&quot;,
                                    &quot;Barack Obama&quot; = &quot;44&quot;,
-                                   &quot;Donald Trump&quot; = &quot;45&quot;),
+                                   &quot;Donald J. Trump&quot; = &quot;45&quot;),
                        selected = &quot;35&quot;),
            width = 4),
     plotOutput(&quot;pres_plot&quot;)
@@ -119,7 +119,9 @@ server &lt;- function(input, output){
   output$pres_plot &lt;- renderPlot({
     tidy_pres %&gt;%
       filter(number == input$number) %&gt;%
-      ggplot(aes(x = as.Date(end_date, format = &quot;%Y-%m-%d&quot;), y = percent, col = opinion)) +
+      ggplot(aes(x = as.Date(end_date, format = &quot;%Y-%m-%d&quot;),
+                 y = percent,
+                 col = opinion)) +
       geom_jitter(alpha = 0.6, size = 1.5) +
       stat_smooth(span = 0.3, se= F) +
       scale_x_date(date_breaks = &quot;4 month&quot;, labels = date_format(&quot;%m-%Y&quot;)) +

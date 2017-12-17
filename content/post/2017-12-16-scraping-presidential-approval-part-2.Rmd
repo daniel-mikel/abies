@@ -106,7 +106,7 @@ knitr::include_app("https://daniel-mikel.shinyapps.io/pres_approve_ucsb/",
 
 The visual style is pretty similar to the (FiveThirtyEight's Trump Approval Tracker)[https://projects.fivethirtyeight.com/trump-approval-ratings/?ex_cid=rrpromo], just with less functionallity and data. I should really come up with a more distinct visual style...
 
-I've used shiny a few times for posting interactive graphics online. I've been having a pretty weird problem with it recently when filtering variables selected through the ui it will randomly drop one of the values in a variable. It's not like it doesn't work or it breaks the app, the app works fine, but shiny will randomly discriminate with a single value sometimes. This time it's Barack Obama (number = 44) and in my grape crush shiny apps it's been San Luis Obispo. I've tried changing the call in the ui from  selectizeInput() to sliderInput(), changing my filtering from dplyr::filter() to df[df$var == "value"] and shiny will still discriminate against that one value. I've spent HOURS trying to figure it out.
+I've used shiny a few times for posting interactive graphics online. I've been having a pretty weird problem with it recently when filtering variables selected through the ui it will randomly drop one of the values in a variable. It's not like it doesn't work or it breaks the app, the app works fine, but shiny will randomly discriminate with a single value sometimes. This time it's Barack Obama (number = 44) and in my grape crush shiny apps it's been San Luis Obispo. I've tried changing the call in the ui from  selectizeInput() to sliderInput(), changing my filtering from dplyr::filter() to df[df$var == "value"] and shiny will still discriminate against that one value. It also works when I run the app on my computer, the error only surfaces when it's published to the shiny server. 
 
 Anyways, here's the code for the shiny app, it works for 13 of the 14 presidents:
 
@@ -121,7 +121,7 @@ tidy_pres$start_date <- as.Date(tidy_pres$start_date,
                                 format = "%Y-%m-%d")
 tidy_pres$end_date <- as.Date(tidy_pres$end_date, 
                               format = "%Y-%m-%d")
-tidy_pres$number <- as.numeric(tidy_pres$number)
+tidy_pres$number <- as.factor(tidy_pres$number)
 
 cols <- c("approve" = "#8BBF9F", "disapprove" = "#F7A278", "unsure" = "#A4BFEB")
 
@@ -139,10 +139,10 @@ ui <- fluidPage(
                                    "Jimmy Carter" = "39",
                                    "Ronald Reagan" = "40",
                                    "George H. W. Bush" = "41",
-                                   "Bill Clinton" = "42",
+                                   "Bill J. Clinton" = "42",
                                    "George W. Bush" = "43",
                                    "Barack Obama" = "44",
-                                   "Donald Trump" = "45"),
+                                   "Donald J. Trump" = "45"),
                        selected = "35"),
            width = 4),
     plotOutput("pres_plot")
@@ -154,7 +154,9 @@ server <- function(input, output){
   output$pres_plot <- renderPlot({
     tidy_pres %>%
       filter(number == input$number) %>%
-      ggplot(aes(x = as.Date(end_date, format = "%Y-%m-%d"), y = percent, col = opinion)) +
+      ggplot(aes(x = as.Date(end_date, format = "%Y-%m-%d"),
+                 y = percent,
+                 col = opinion)) +
       geom_jitter(alpha = 0.6, size = 1.5) +
       stat_smooth(span = 0.3, se= F) +
       scale_x_date(date_breaks = "4 month", labels = date_format("%m-%Y")) +
