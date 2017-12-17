@@ -22,6 +22,7 @@ I used two packages for this project: rvest for scrapping the data from the web,
 ```{r, message = FALSE}
 library("rvest")
 library("tidyverse")
+library("scales")
 ```
 
 Then I just used my function from last time, but just iterated over the different url's. I noticed that the two digit numeric chunk in the center of the url corresponed to the number of the presidency. Easy enough. All I needed was a column which I could use to discern different presidencys (I could go by data but this was more efficient). 
@@ -86,7 +87,11 @@ tidy_pres %>%
   ggplot(aes(x = end_date, y = percent, col = opinion)) +
   geom_jitter(alpha = 0.5, shape = 1) +
   geom_smooth(method = "gam",  formula = y ~ s(x, bs = "cs"), se = F) +
-  theme_minimal() + 
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+  ylab("Percent") +
+  xlab(NULL) +
+  theme_minimal() +
+  theme(axis.text.x=element_text(angle=60, hjust=1)) + 
   scale_colour_manual(values = cols)
 ```
 

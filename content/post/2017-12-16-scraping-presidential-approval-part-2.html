@@ -11,7 +11,8 @@ output: html_document
 <p>If want to read my previous post about scrapping, cleaning, and tidying data from a single page from the <a href="http://www.presidency.ucsb.edu/index.php">The American Presidency Project</a> check out my previous post <a href="https://abies.netlify.com/2017/12/scraping-presidential-approval/">here</a>.</p>
 <p>I used two packages for this project: rvest for scrapping the data from the web, and tidyverse to do most of the manipulation of the scrapped data.</p>
 <pre class="r"><code>library(&quot;rvest&quot;)
-library(&quot;tidyverse&quot;)</code></pre>
+library(&quot;tidyverse&quot;)
+library(&quot;scales&quot;)</code></pre>
 <p>Then I just used my function from last time, but just iterated over the different url’s. I noticed that the two digit numeric chunk in the center of the url corresponed to the number of the presidency. Easy enough. All I needed was a column which I could use to discern different presidencys (I could go by data but this was more efficient).</p>
 <pre class="r"><code>all_pres &lt;- as.data.frame(NULL)
 
@@ -62,7 +63,11 @@ tidy_pres %&gt;%
   ggplot(aes(x = end_date, y = percent, col = opinion)) +
   geom_jitter(alpha = 0.5, shape = 1) +
   geom_smooth(method = &quot;gam&quot;,  formula = y ~ s(x, bs = &quot;cs&quot;), se = F) +
-  theme_minimal() + 
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+  ylab(&quot;Percent&quot;) +
+  xlab(NULL) +
+  theme_minimal() +
+  theme(axis.text.x=element_text(angle=60, hjust=1)) + 
   scale_colour_manual(values = cols)</code></pre>
 <p><img src="/post/2017-12-16-scraping-presidential-approval-part-2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>I made a shiny app:</p>
