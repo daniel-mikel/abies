@@ -21,7 +21,9 @@ for (i in 1:(45-31)){
   i &lt;- i +31
   
   # get url
-  url &lt;- paste0(&quot;http://www.presidency.ucsb.edu/data/popularity.php?pres=&quot;, i, &quot;&amp;sort=time&amp;direct=DESC&amp;Submit=DISPLAY&quot;)
+  url &lt;- paste0(&quot;http://www.presidency.ucsb.edu/data/popularity.php?pres=&quot;, 
+                i, 
+                &quot;&amp;sort=time&amp;direct=DESC&amp;Submit=DISPLAY&quot;)
   
   # scrape data and save as character vector              
   webpage &lt;- read_html(url)

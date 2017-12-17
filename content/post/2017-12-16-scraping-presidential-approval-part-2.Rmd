@@ -34,7 +34,9 @@ for (i in 1:(45-31)){
   i <- i +31
   
   # get url
-  url <- paste0("http://www.presidency.ucsb.edu/data/popularity.php?pres=", i, "&sort=time&direct=DESC&Submit=DISPLAY")
+  url <- paste0("http://www.presidency.ucsb.edu/data/popularity.php?pres=", 
+                i, 
+                "&sort=time&direct=DESC&Submit=DISPLAY")
   
   # scrape data and save as character vector              
   webpage <- read_html(url)
