@@ -1,0 +1,137 @@
+---
+title: "Scraping Presidential Approval - Part 2"
+author: "Daniel Mikel"
+date: "2017-12-16T14:27:12-05:00"
+output: html_document
+---
+
+
+
+<p>The other day I built my first web scraper for a single page. I ended the blogpost pretty satisfied with myself and thought I’d come back to the project at a later date to try to build my first web scraper to take all the presidential approval ratings from the site. I didn’t know how hard it would be at the time, and I was at the end of a long day at work. It might be because the University of California at Santa Barbara’s <a href="http://www.presidency.ucsb.edu/index.php">The American Presidency Project</a> was uniquely easy to scrape due to it’s url but it took me like 7 minutes. A nice surprise.</p>
+<p>If want to read my previous post about scrapping, cleaning, and tidying data from a single page from the <a href="http://www.presidency.ucsb.edu/index.php">The American Presidency Project</a> check out my previous post <a href="https://abies.netlify.com/2017/12/scraping-presidential-approval/">here</a>.</p>
+<p>I used two packages for this project: rvest for scrapping the data from the web, and tidyverse to do most of the manipulation of the scrapped data.</p>
+<pre class="r"><code>library(&quot;rvest&quot;)
+library(&quot;tidyverse&quot;)</code></pre>
+<p>Then I just used my function from last time, but just iterated over the different url’s. I noticed that the two digit numeric chunk in the center of the url corresponed to the number of the presidency. Easy enough. All I needed was a column which I could use to discern different presidencys (I could go by data but this was more efficient).</p>
+<pre class="r"><code>all_pres &lt;- as.data.frame(NULL)
+
+for (i in 1:(45-31)){
+  i &lt;- i +31
+  
+  # get url
+  url &lt;- paste0(&quot;http://www.presidency.ucsb.edu/data/popularity.php?pres=&quot;, i, &quot;&amp;sort=time&amp;direct=DESC&amp;Submit=DISPLAY&quot;)
+  
+  # scrape data and save as character vector              
+  webpage &lt;- read_html(url)
+  approval_html &lt;- html_nodes(webpage, &#39;.listdate&#39;)
+  approval_data &lt;- html_text(approval_html, trim = TRUE)
+  
+  # clean character vector of empty data
+  approval_data[approval_data==&quot;&quot;] &lt;- NA
+  approval_data[1:2] &lt;- NA
+  approval_data &lt;- na.omit(approval_data)
+  
+  # convert to data.fame
+  pres_matrix &lt;- matrix(approval_data, ncol = 5, byrow = TRUE)
+  pres_df &lt;- as.data.frame(pres_matrix, stringsAsFactors = FALSE)
+  names(pres_df) &lt;- c(&quot;start_date&quot;, &quot;end_date&quot;, &quot;approve&quot;, &quot;disapprove&quot;, &quot;unsure&quot;)
+  
+  # clean up object classes
+  pres_df[] &lt;- lapply(pres_df, type.convert)
+  pres_df$start_date &lt;- as.Date(pres_df$start_date, 
+                                 format = &quot;%m/%d/%Y&quot;)
+  pres_df$end_date &lt;- as.Date(pres_df$end_date, 
+                               format = &quot;%m/%d/%Y&quot;)
+  
+  # keep information on which president the row of data represents
+  pres_df$number &lt;- i
+  
+  # get data into single dataframe
+  all_pres &lt;- rbind(all_pres, pres_df)
+}</code></pre>
+<p>That was easier than I thought. I didn’t really believe it would work on my first try. Scrapping data from mutliple webpages would probably be pretty challenging on a website with a more opaque url pattern, but I really shouldn’t have psyched myself out of scrapping data from the web.</p>
+<p>On another note, I probably didn’t need to clean the data that much before combining it into a single dataframe, but given the small volume of data I was processing this didn’t noticably slow down my code.</p>
+<p>Now we just need to get it ready to graph:</p>
+<pre class="r"><code>tidy_pres &lt;- all_pres %&gt;%
+  gather(opinion, percent, -c(number, start_date, end_date)) </code></pre>
+<p>Now we can graph whichever POTUS’ approval rating we feel like.</p>
+<pre class="r"><code>cols &lt;- c(&quot;approve&quot; = &quot;#8BBF9F&quot;, &quot;disapprove&quot; = &quot;#F7A278&quot;, &quot;unsure&quot; = &quot;#A4BFEB&quot;)
+
+tidy_pres %&gt;%
+  filter(number == &quot;34&quot;) %&gt;%
+  ggplot(aes(x = end_date, y = percent, col = opinion)) +
+  geom_jitter(alpha = 0.5, shape = 1) +
+  geom_smooth(method = &quot;gam&quot;,  formula = y ~ s(x, bs = &quot;cs&quot;), se = F) +
+  theme_minimal() + 
+  scale_colour_manual(values = cols)</code></pre>
+<p><img src="/post/2017-12-16-scraping-presidential-approval-part-2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>I made a shiny app:</p>
+<iframe src="https://daniel-mikel.shinyapps.io/pres_approve_ucsb/?showcase=0" width="768" height="650px">
+</iframe>
+<p>For some reason running geom_smooth(method = “gam”) was tripping an error when publishing on the shiny server. I ended up just switching to a loess function, but I wasn’t happy that I couldn’t find a direct fix.</p>
+<p>Here’s the code for the shiny app:</p>
+<pre class="r"><code>library(shiny)
+library(tidyverse)
+library(scales)
+
+tidy_pres &lt;- read.csv(&quot;tidy_pres.csv&quot;, stringsAsFactors = FALSE)
+
+tidy_pres$start_date &lt;- as.Date(tidy_pres$start_date, 
+                                format = &quot;%Y-%m-%d&quot;)
+tidy_pres$end_date &lt;- as.Date(tidy_pres$end_date, 
+                              format = &quot;%Y-%m-%d&quot;)
+tidy_pres$number &lt;- as.numeric(tidy_pres$number)
+
+cols &lt;- c(&quot;approve&quot; = &quot;#8BBF9F&quot;, &quot;disapprove&quot; = &quot;#F7A278&quot;, &quot;unsure&quot; = &quot;#A4BFEB&quot;)
+
+ui &lt;- fluidPage(
+  
+  titlePanel(&quot;Presidential Approval Rating&quot;),
+  
+  fluidRow(
+    column(selectizeInput(&quot;number&quot;, &quot;Select POTUS&quot;,
+                          choices = c(&quot;Franklin D. Roosevelt&quot; = &quot;32&quot;,
+                                      &quot;Harry S. Truman&quot; = &quot;33&quot;,
+                                      &quot;Dwight D. Eisenhower&quot; = &quot;34&quot;,
+                                      &quot;John F. Kennedy&quot; = &quot;35&quot;,
+                                      &quot;Lyndon B. Johnson&quot; = &quot;36&quot;,
+                                      &quot;Richard Nixon&quot; = &quot;37&quot;,
+                                      &quot;Gerald Ford&quot; = &quot;38&quot;,
+                                      &quot;Jimmy Carter&quot; = &quot;39&quot;,
+                                      &quot;Ronald Reagan&quot; = &quot;40&quot;,
+                                      &quot;George H. W. Bush&quot; = &quot;41&quot;,
+                                      &quot;Bill Clinton&quot; = &quot;42&quot;,
+                                      &quot;George W. Bush&quot; = &quot;43&quot;,
+                                      &quot;Barack Obama&quot; = &quot;44&quot;,
+                                      &quot;Donald Trump&quot; = &quot;45&quot;),
+                          selected = &quot;35&quot;),
+           width = 3),
+    
+    plotOutput(&quot;pres_plot&quot;)
+  )
+)
+
+server &lt;- function(input, output){
+  filtered &lt;- reactive({
+    tidy_pres %&gt;%
+      filter(number == input$number) 
+  })
+  
+  output$pres_plot &lt;- renderPlot({
+    ggplot(data = filtered(), aes(x = as.Date(end_date, format = &quot;%Y-%m-%d&quot;), y = percent, col = opinion)) +
+      geom_jitter(alpha = 0.6, size = 1.5) +
+      stat_smooth(span = 0.3, se= F) +
+      scale_x_date(date_breaks = &quot;4 month&quot;, labels = date_format(&quot;%m-%Y&quot;)) +
+      scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+      ylab(&quot;Percent&quot;) +
+      xlab(NULL) +
+      theme_minimal() +
+      theme(axis.text.x=element_text(angle=60, hjust=1)) + 
+      scale_colour_manual(values = cols)
+    
+  })
+}
+
+shinyApp(ui = ui, server = server)</code></pre>
+<p>The visual style is pretty similar to the (FiveThirtyEight’s Trump Approval Tracker)[<a href="https://projects.fivethirtyeight.com/trump-approval-ratings/?ex_cid=rrpromo" class="uri">https://projects.fivethirtyeight.com/trump-approval-ratings/?ex_cid=rrpromo</a>], just with less functionallity and data. I should really come up with a more distinct visual style…</p>
+<p>I’ll probably set this project down for a little while after this. I’m pretty happy that I’ve gotten some experience with web scrapping, and it’s pretty cool to finally be using my R skills for something politics related.</p>

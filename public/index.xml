@@ -6,10 +6,19 @@
     <description>Recent content on Abies</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 14 Dec 2017 21:19:12 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 16 Dec 2017 14:27:12 -0500</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Scraping Presidential Approval - Part 2</title>
+      <link>/2017/12/scraping-presidential-approval---part-2/</link>
+      <pubDate>Sat, 16 Dec 2017 14:27:12 -0500</pubDate>
+      
+      <guid>/2017/12/scraping-presidential-approval---part-2/</guid>
+      <description>The other day I built my first web scraper for a single page. I ended the blogpost pretty satisfied with myself and thought I’d come back to the project at a later date to try to build my first web scraper to take all the presidential approval ratings from the site. I didn’t know how hard it would be at the time, and I was at the end of a long day at work.</description>
+    </item>
     
     <item>
       <title>Scraping Presidential Approval</title>

@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/2017/12/scraping-presidential-approval---part-2/</loc>
+    <lastmod>2017-12-16T14:27:12-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/2017/12/scraping-presidential-approval/</loc>
     <lastmod>2017-12-14T21:19:12-05:00</lastmod>
   </url>
@@ -28,7 +33,7 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2017-12-14T21:19:12-05:00</lastmod>
+    <lastmod>2017-12-16T14:27:12-05:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -44,7 +49,7 @@
   
   <url>
     <loc>/post/</loc>
-    <lastmod>2017-12-14T21:19:12-05:00</lastmod>
+    <lastmod>2017-12-16T14:27:12-05:00</lastmod>
     <priority>0</priority>
   </url>
   
